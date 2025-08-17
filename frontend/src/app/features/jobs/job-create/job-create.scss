@@ -1,0 +1,29 @@
+.container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.skills-section {
+  margin-bottom: 16px;
+}
+
+.skill-input {
+  width: 100%;
+}
+
+.skills-chips {
+  margin-top: 8px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}

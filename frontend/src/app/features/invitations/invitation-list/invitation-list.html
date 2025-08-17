@@ -1,0 +1,153 @@
+<div class="invitations-container">
+  <div class="header">
+    <h2>{{ getPageTitle() }}</h2>
+    <button mat-raised-button color="primary" (click)="loadInvitations()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <mat-icon>hourglass_empty</mat-icon>
+    <p>Loading {{ isEmployee() ? 'your invitations' : 'sent invitations' }}...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && invitations.length === 0">
+    <mat-icon>mail_outline</mat-icon>
+    <h3>{{ isEmployee() ? 'No Invitations Yet' : 'No Invitations Sent' }}</h3>
+    <p>{{ isEmployee() ? 'When HR invites you to job opportunities, they will appear here.' : 'Invitations you send to candidates will appear here. Use the job matching feature to discover and invite qualified candidates.' }}</p>
+  </div>
+
+  <!-- Pending Invitations Section -->
+  <div class="section" *ngIf="!loading && pendingInvitations.length > 0">
+    <div class="section-header">
+      <h3>
+        <mat-icon>schedule</mat-icon>
+        Pending Invitations
+        <mat-chip [matBadge]="pendingInvitations.length" class="pending-badge">
+          {{ pendingInvitations.length }}
+        </mat-chip>
+      </h3>
+    </div>
+
+    <div class="invitations-grid">
+      <mat-card 
+        *ngFor="let invitation of pendingInvitations" 
+        class="invitation-card pending"
+        (click)="openInvitation(invitation)">
+        
+        <mat-card-header>
+          <mat-card-title>{{ invitation.job.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <div class="subtitle-line">
+              <span>{{ invitation.job.team }}{{ invitation.job.location ? ' • ' + invitation.job.location : '' }}</span>
+              <mat-chip class="status-chip pending">
+                <mat-icon>schedule</mat-icon>
+                Pending
+              </mat-chip>
+            </div>
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <p class="job-description">{{ invitation.job.short_description || invitation.job.description || 'No description available' }}</p>
+          
+          <div class="invitation-meta">
+            <div class="inviter-info">
+              <mat-icon>person</mat-icon>
+              <span>Invited by {{ invitation.inviter.full_name || invitation.inviter.name }}</span>
+            </div>
+            <div class="date-info">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ formatDate(invitation.created_at) }}</span>
+            </div>
+          </div>
+
+          <div class="personal-message" *ngIf="invitation.personal_message">
+            <mat-icon>format_quote</mat-icon>
+            <span>"{{ invitation.personal_message }}"</span>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button mat-button color="warn">
+            <mat-icon>cancel</mat-icon>
+            Decline
+          </button>
+          <button mat-raised-button color="primary">
+            <mat-icon>check_circle</mat-icon>
+            Accept
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- All Invitations Section -->
+  <div class="section" *ngIf="!loading && invitations.length > 0">
+    <div class="section-header">
+      <h3>
+        <mat-icon>history</mat-icon>
+        All Invitations
+      </h3>
+    </div>
+
+    <div class="invitations-grid">
+      <mat-card 
+        *ngFor="let invitation of invitations" 
+        class="invitation-card"
+        [class.accepted]="invitation.status === 'accepted'"
+        [class.declined]="invitation.status === 'declined'"
+        [class.pending]="invitation.status === 'pending'"
+        (click)="openInvitation(invitation)">
+        
+        <mat-card-header>
+          <mat-card-title>{{ invitation.job.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <div class="subtitle-line">
+              <span>{{ invitation.job.team }}{{ invitation.job.location ? ' • ' + invitation.job.location : '' }}</span>
+              <mat-chip 
+                class="status-chip"
+                [class.accepted]="invitation.status === 'accepted'"
+                [class.declined]="invitation.status === 'declined'"
+                [class.pending]="invitation.status === 'pending'">
+                <mat-icon>{{ getStatusIcon(invitation.status) }}</mat-icon>
+                {{ invitation.status | titlecase }}
+              </mat-chip>
+            </div>
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <p class="job-description">{{ invitation.job.short_description || invitation.job.description || 'No description available' }}</p>
+          
+          <div class="invitation-meta">
+            <div class="inviter-info">
+              <mat-icon>person</mat-icon>
+              <span>{{ invitation.inviter.full_name || invitation.inviter.name }}</span>
+            </div>
+            <div class="date-info">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ formatDate(invitation.created_at) }}</span>
+            </div>
+            <div class="response-date" *ngIf="invitation.responded_at">
+              <mat-icon>reply</mat-icon>
+              <span>Responded {{ formatDate(invitation.responded_at) }}</span>
+            </div>
+          </div>
+
+          <div class="personal-message" *ngIf="invitation.personal_message">
+            <mat-icon>format_quote</mat-icon>
+            <span>"{{ invitation.personal_message }}"</span>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions *ngIf="invitation.status === 'pending'">
+          <span class="pending-actions">Click to respond</span>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,265 @@
+<div class="profile-container">
+  <h1>My Profile</h1>
+  
+  <div *ngIf="isLoading" class="loading">
+    Loading profile...
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+    <!-- Basic Information -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Basic Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Full Name</mat-label>
+            <input matInput formControlName="name" required>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" required>
+          </mat-form-field>
+        </div>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Years of Experience</mat-label>
+            <input matInput type="number" formControlName="years_experience" min="0">
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Location</mat-label>
+            <input matInput formControlName="location">
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Technical Skills -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Technical Skills</mat-card-title>
+        <button mat-icon-button type="button" (click)="addSkill()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="technical_skills" class="array-fields">
+          <div *ngFor="let skill of technicalSkills.controls; let i = index" class="array-item">
+            <mat-form-field appearance="outline">
+              <mat-label>Skill {{ i + 1 }}</mat-label>
+              <input matInput [formControlName]="i">
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removeSkill(i)" color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button mat-button type="button" (click)="addSkill()" *ngIf="technicalSkills.length === 0">
+          <mat-icon>add</mat-icon>
+          Add Skill
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Achievements -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Achievements</mat-card-title>
+        <button mat-icon-button type="button" (click)="addAchievement()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="achievements" class="array-fields">
+          <div *ngFor="let achievement of achievements.controls; let i = index" class="array-item">
+            <mat-form-field appearance="outline">
+              <mat-label>Achievement {{ i + 1 }}</mat-label>
+              <textarea matInput [formControlName]="i" rows="2"></textarea>
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removeAchievement(i)" color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button mat-button type="button" (click)="addAchievement()" *ngIf="achievements.length === 0">
+          <mat-icon>add</mat-icon>
+          Add Achievement
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Education -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Education</mat-card-title>
+        <button mat-icon-button type="button" (click)="addEducation()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="education" class="array-fields">
+          <div *ngFor="let edu of education.controls; let i = index" [formGroupName]="i" class="education-item">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Institution</mat-label>
+                <input matInput formControlName="institution">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Degree</mat-label>
+                <input matInput formControlName="degree">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Field of Study</mat-label>
+                <input matInput formControlName="field_of_study">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Graduation Year</mat-label>
+                <input matInput formControlName="graduation_year">
+              </mat-form-field>
+              
+              <button mat-icon-button type="button" (click)="removeEducation(i)" color="warn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button mat-button type="button" (click)="addEducation()" *ngIf="education.length === 0">
+          <mat-icon>add</mat-icon>
+          Add Education
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Past Companies -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Work Experience</mat-card-title>
+        <button mat-icon-button type="button" (click)="addCompany()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="past_companies" class="array-fields">
+          <div *ngFor="let company of pastCompanies.controls; let i = index" [formGroupName]="i" class="company-item">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Company Name</mat-label>
+                <input matInput formControlName="name">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Position</mat-label>
+                <input matInput formControlName="position">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Duration</mat-label>
+                <input matInput formControlName="duration" placeholder="e.g., 2020-2023">
+              </mat-form-field>
+              
+              <button mat-icon-button type="button" (click)="removeCompany(i)" color="warn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button mat-button type="button" (click)="addCompany()" *ngIf="pastCompanies.length === 0">
+          <mat-icon>add</mat-icon>
+          Add Work Experience
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Certifications -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Certifications</mat-card-title>
+        <button mat-icon-button type="button" (click)="addCertification()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="certifications" class="array-fields">
+          <div *ngFor="let cert of certifications.controls; let i = index" class="array-item">
+            <mat-form-field appearance="outline">
+              <mat-label>Certification {{ i + 1 }}</mat-label>
+              <input matInput [formControlName]="i">
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removeCertification(i)" color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button mat-button type="button" (click)="addCertification()" *ngIf="certifications.length === 0">
+          <mat-icon>add</mat-icon>
+          Add Certification
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Publications -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Publications</mat-card-title>
+        <button mat-icon-button type="button" (click)="addPublication()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="publications" class="array-fields">
+          <div *ngFor="let pub of publications.controls; let i = index" class="array-item">
+            <mat-form-field appearance="outline">
+              <mat-label>Publication {{ i + 1 }}</mat-label>
+              <textarea matInput [formControlName]="i" rows="2"></textarea>
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removePublication(i)" color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button mat-button type="button" (click)="addPublication()" *ngIf="publications.length === 0">
+          <mat-icon>add</mat-icon>
+          Add Publication
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Career Aspirations -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Career Aspirations</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>What are your career goals and aspirations?</mat-label>
+          <textarea matInput formControlName="career_aspirations" rows="4"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="profileForm.invalid || isSaving">
+        {{ isSaving ? 'Saving...' : 'Save Profile' }}
+      </button>
+      
+      <button mat-button type="button" routerLink="/dashboard">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

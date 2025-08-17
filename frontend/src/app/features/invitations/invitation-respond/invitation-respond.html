@@ -1,0 +1,124 @@
+<div class="invitation-dialog">
+  <div mat-dialog-title class="dialog-header">
+    <h2>Job Invitation</h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <!-- Job Details -->
+    <mat-card class="job-card">
+      <mat-card-header>
+        <mat-card-title>{{ invitation.job.title }}</mat-card-title>
+        <mat-card-subtitle>{{ invitation.job.team }}{{ invitation.job.location ? ' • ' + invitation.job.location : '' }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p class="job-description">{{ invitation.job.short_description || invitation.job.description || 'No description available' }}</p>
+        
+        <div class="job-details">
+          <div class="detail-item">
+            <mat-icon>work</mat-icon>
+            <span>{{ invitation.job.employment_type || 'Not specified' }}</span>
+          </div>
+          <div class="detail-item" *ngIf="invitation.job.salary_range">
+            <mat-icon>attach_money</mat-icon>
+            <span>{{ invitation.job.salary_range }}</span>
+          </div>
+          <div class="detail-item" *ngIf="invitation.job.created_at">
+            <mat-icon>schedule</mat-icon>
+            <span>Posted {{ formatDate(invitation.job.created_at) }}</span>
+          </div>
+        </div>
+
+        <div class="skills" *ngIf="invitation.job.required_skills?.length">
+          <h4>Required Skills:</h4>
+          <mat-chip-set>
+            <mat-chip *ngFor="let skill of invitation.job.required_skills">{{ skill }}</mat-chip>
+          </mat-chip-set>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Invitation Details -->
+    <mat-card class="invitation-card">
+      <mat-card-header>
+        <mat-card-title>Invitation from {{ invitation.inviter.full_name || invitation.inviter.name }}</mat-card-title>
+        <mat-card-subtitle>{{ invitation.inviter.current_job_title || 'Team Member' }} • Invited {{ formatDate(invitation.created_at) }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content *ngIf="invitation.personal_message">
+        <p class="personal-message">"{{ invitation.personal_message }}"</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Response Form -->
+    <div class="response-section" *ngIf="invitation.status === 'pending'">
+      <h3>Your Response</h3>
+      
+      <mat-form-field appearance="outline" class="reason-field">
+        <mat-label>Message (required for declining)</mat-label>
+        <textarea 
+          matInput 
+          [(ngModel)]="reason" 
+          rows="3" 
+          placeholder="Share your thoughts or reason for your decision...">
+        </textarea>
+      </mat-form-field>
+    </div>
+
+    <!-- Status Display -->
+    <div class="status-section" *ngIf="invitation.status !== 'pending'">
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="status-display">
+            <mat-icon [style.color]="invitation.status === 'accepted' ? 'green' : 'red'">
+              {{ invitation.status === 'accepted' ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+            <span>You {{ invitation.status }} this invitation</span>
+          </div>
+          <p *ngIf="invitation.employee_response_reason" class="response-reason">
+            Your message: "{{ invitation.employee_response_reason }}"
+          </p>
+          <p class="response-date" *ngIf="invitation.responded_at">
+            Responded on {{ formatDate(invitation.responded_at) }}
+          </p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions" *ngIf="invitation.status === 'pending'">
+    <button 
+      mat-button 
+      (click)="close()" 
+      [disabled]="submitting">
+      Cancel
+    </button>
+    
+    <button 
+      mat-raised-button 
+      color="warn" 
+      (click)="decline()" 
+      [disabled]="submitting || !reason.trim()">
+      <mat-icon>cancel</mat-icon>
+      Decline
+    </button>
+    
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="accept()" 
+      [disabled]="submitting">
+      <mat-icon>check_circle</mat-icon>
+      Accept Invitation
+    </button>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions" *ngIf="invitation.status !== 'pending'">
+    <button mat-raised-button color="primary" (click)="close()">
+      Close
+    </button>
+  </div>
+</div>

@@ -1,0 +1,149 @@
+<div class="invitation-detail-container">
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <p>Loading invitation details...</p>
+  </div>
+
+  <div *ngIf="!isLoading && invitation" class="invitation-content">
+    <!-- Header -->
+    <div class="detail-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Invitation Details</h1>
+      <mat-chip [color]="getStatusColor(invitation.status)" [ngClass]="'status-chip-' + invitation.status">
+        {{ invitation.status | titlecase }}
+      </mat-chip>
+    </div>
+
+    <!-- Job Information -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>work</mat-icon>
+          Position Details
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="job-info">
+          <h2>{{ invitation.job.title }}</h2>
+          <p class="team-info">
+            <mat-icon>group</mat-icon>
+            {{ invitation.job.team }}
+            <span *ngIf="invitation.job.department"> • {{ invitation.job.department }}</span>
+          </p>
+          
+          <div class="description" *ngIf="invitation.job.description">
+            <h3>Job Description</h3>
+            <p>{{ invitation.job.description }}</p>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item" *ngIf="invitation.job.manager_name">
+              <strong>Hiring Manager:</strong>
+              <span>{{ invitation.job.manager_name }}</span>
+            </div>
+            
+            <div class="detail-item" *ngIf="invitation.job.employment_type">
+              <strong>Employment Type:</strong>
+              <span>{{ invitation.job.employment_type }}</span>
+            </div>
+            
+            <div class="detail-item" *ngIf="invitation.job.salary_range">
+              <strong>Salary Range:</strong>
+              <span>{{ invitation.job.salary_range }}</span>
+            </div>
+            
+            <div class="detail-item" *ngIf="invitation.job.created_at">
+              <strong>Posted:</strong>
+              <span>{{ invitation.job.created_at | date }}</span>
+            </div>
+          </div>
+
+          <div class="skills-section" *ngIf="invitation.job.required_skills?.length">
+            <h3>Required Skills</h3>
+            <div class="skills-chips">
+              <mat-chip *ngFor="let skill of invitation.job.required_skills">
+                {{ skill }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Invitation Details -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>mail</mat-icon>
+          Invitation Information
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="invitation-info">
+          <div class="details-grid">
+            <div class="detail-item">
+              <strong>Invited Employee:</strong>
+              <span>{{ invitation.employee.name }}</span>
+            </div>
+            
+            <div class="detail-item">
+              <strong>Employee Email:</strong>
+              <span>{{ invitation.employee.email }}</span>
+            </div>
+            
+            <div class="detail-item">
+              <strong>Invited By:</strong>
+              <span>{{ invitation.inviter.name }}</span>
+              <span *ngIf="invitation.inviter.current_job_title" class="job-title">
+                ({{ invitation.inviter.current_job_title }})
+              </span>
+            </div>
+            
+            <div class="detail-item">
+              <strong>Invitation Date:</strong>
+              <span>{{ invitation.created_at | date:'medium' }}</span>
+            </div>
+            
+            <div class="detail-item" *ngIf="invitation.responded_at">
+              <strong>Response Date:</strong>
+              <span>{{ invitation.responded_at | date:'medium' }}</span>
+            </div>
+          </div>
+
+          <div class="personal-message" *ngIf="invitation.personal_message">
+            <h3>Personal Message</h3>
+            <div class="message-content">
+              {{ invitation.personal_message }}
+            </div>
+          </div>
+
+          <div class="response-reason" *ngIf="invitation.employee_response_reason">
+            <h3>Employee Response</h3>
+            <div class="response-content">
+              {{ invitation.employee_response_reason }}
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Actions -->
+    <div class="actions-section">
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Invitations
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !invitation" class="error-state">
+    <mat-icon>error</mat-icon>
+    <h2>Invitation Not Found</h2>
+    <p>The invitation you're looking for could not be found.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Back to Invitations
+    </button>
+  </div>
+</div>

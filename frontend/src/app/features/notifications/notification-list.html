@@ -1,0 +1,77 @@
+<div class="notifications-container">
+  <div class="header">
+    <h1>Notifications</h1>
+    <button mat-button 
+            color="primary" 
+            (click)="markAllAsRead()"
+            [disabled]="getUnreadNotifications().length === 0">
+      <mat-icon>done_all</mat-icon>
+      Mark All Read
+    </button>
+  </div>
+  
+  <div *ngIf="isLoading" class="loading">
+    <mat-icon>refresh</mat-icon>
+    Loading notifications...
+  </div>
+
+  <div *ngIf="!isLoading && notifications.length === 0" class="no-notifications">
+    <mat-icon>notifications_none</mat-icon>
+    <h3>No notifications</h3>
+    <p>You're all caught up! Check back later for updates.</p>
+  </div>
+
+  <div *ngIf="!isLoading && notifications.length > 0" class="notifications-content">
+    <!-- Unread Notifications -->
+    <mat-card *ngIf="getUnreadNotifications().length > 0" class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon matBadge="{{ getUnreadNotifications().length }}" matBadgeColor="warn">
+            markunread
+          </mat-icon>
+          Unread ({{ getUnreadNotifications().length }})
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item *ngFor="let notification of getUnreadNotifications()" 
+                         class="notification-item unread"
+                         (click)="onNotificationClick(notification)">
+            <mat-icon matListItemIcon>{{ getNotificationIcon(notification) }}</mat-icon>
+            <div matListItemTitle>{{ notification.content }}</div>
+            <div matListItemLine>{{ notification.created_at | date:'medium' }}</div>
+            <button mat-icon-button matListItemMeta 
+                    (click)="markAsRead(notification); $event.stopPropagation()"
+                    matTooltip="Mark as read">
+              <mat-icon>done</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Read Notifications -->
+    <mat-card *ngIf="getReadNotifications().length > 0" class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>drafts</mat-icon>
+          Read ({{ getReadNotifications().length }})
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item *ngFor="let notification of getReadNotifications()" 
+                         class="notification-item read"
+                         (click)="navigateToNotificationTarget(notification)">
+            <mat-icon matListItemIcon>{{ getNotificationIcon(notification) }}</mat-icon>
+            <div matListItemTitle>{{ notification.content }}</div>
+            <div matListItemLine>{{ notification.created_at | date:'medium' }}</div>
+            <mat-icon matListItemMeta class="read-indicator">done</mat-icon>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

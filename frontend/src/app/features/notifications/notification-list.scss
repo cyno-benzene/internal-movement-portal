@@ -1,0 +1,203 @@
+.notifications-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  h1 {
+    margin: 0;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  
+  mat-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 10px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+.no-notifications {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 20px;
+    color: #ccc;
+  }
+  
+  h3 {
+    margin: 10px 0;
+    font-weight: 400;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+.section-card {
+  margin-bottom: 20px;
+  
+  mat-card-header {
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+}
+
+.notification-item {
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f8f9fa;
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &.unread {
+    background-color: #fff9e6;
+    border-left: 4px solid #ff9800;
+    
+    [matListItemTitle] {
+      font-weight: 500;
+    }
+    
+    &:hover {
+      background-color: #fff3cd;
+    }
+  }
+  
+  &.read {
+    opacity: 0.7;
+    
+    [matListItemTitle] {
+      font-weight: 400;
+    }
+  }
+}
+
+.read-indicator {
+  color: #4caf50;
+  font-size: 1.2rem;
+}
+
+// Badge styles
+::ng-deep .mat-badge-content {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+// List item styles
+mat-list-item {
+  height: auto !important;
+  min-height: 72px;
+  
+  [matListItemIcon] {
+    margin-right: 16px;
+    color: #666;
+  }
+  
+  [matListItemTitle] {
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    display: block;
+  }
+  
+  [matListItemLine] {
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.2;
+  }
+  
+  [matListItemMeta] {
+    margin-left: 16px;
+  }
+}
+
+// Animation for spin
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Snackbar styles
+::ng-deep {
+  .success-snackbar {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .error-snackbar {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .info-snackbar {
+    background-color: #2196f3;
+    color: white;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .notifications-container {
+    padding: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    
+    h1 {
+      text-align: center;
+    }
+  }
+  
+  .no-notifications {
+    padding: 40px 10px;
+    
+    mat-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+  
+  mat-list-item {
+    min-height: 64px;
+    
+    [matListItemTitle] {
+      font-size: 0.9rem;
+    }
+    
+    [matListItemLine] {
+      font-size: 0.75rem;
+    }
+  }
+}

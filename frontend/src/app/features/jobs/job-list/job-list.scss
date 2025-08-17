@@ -1,0 +1,36 @@
+.container {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  
+  &.open {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+  }
+  
+  &.closed {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+  
+  &.filled {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+  }
+}

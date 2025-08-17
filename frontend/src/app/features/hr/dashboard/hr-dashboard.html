@@ -1,0 +1,246 @@
+<div class="dashboard-container">
+  <h1>HR Dashboard</h1>
+  
+  <!-- Company Stats -->
+  <mat-grid-list cols="6" rowHeight="150px" gutterSize="20px" class="stats-grid">
+    <mat-grid-tile>
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stat-number">{{ companyStats.totalEmployees }}</div>
+          <div class="stat-label">Total Employees</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    
+    <mat-grid-tile>
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stat-number">{{ companyStats.totalJobs }}</div>
+          <div class="stat-label">Total Jobs</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    
+    <mat-grid-tile>
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stat-number">{{ companyStats.activeJobs }}</div>
+          <div class="stat-label">Active Jobs</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    
+    <mat-grid-tile>
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stat-number">{{ companyStats.totalInvitations }}</div>
+          <div class="stat-label">Total Invitations</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    
+    <mat-grid-tile>
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stat-number pending">{{ companyStats.pendingInvitations }}</div>
+          <div class="stat-label">Pending Response</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    
+    <mat-grid-tile>
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stat-number approved">{{ companyStats.successfulPlacements }}</div>
+          <div class="stat-label">Successful Placements</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+
+  <!-- Main Content -->
+  <mat-tab-group class="dashboard-tabs">
+    <!-- Pending Invitations Tab -->
+    <mat-tab label="Pending Invitations ({{ getPendingInvitations().length }})">
+      <div class="tab-content">
+        <div *ngIf="getPendingInvitations().length === 0" class="no-data">
+          No pending invitations to review.
+        </div>
+        
+        <mat-table [dataSource]="getPendingInvitations()" *ngIf="getPendingInvitations().length > 0">
+          <ng-container matColumnDef="employee_name">
+            <mat-header-cell *matHeaderCellDef>Employee</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <div class="employee-info">
+                <strong>{{ invitation.employee.name }}</strong>
+                <small>{{ invitation.employee.email }}</small>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="job_title">
+            <mat-header-cell *matHeaderCellDef>Position</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <div class="job-info">
+                <strong>{{ invitation.job.title }}</strong>
+                <small>{{ invitation.job.department }}</small>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="manager">
+            <mat-header-cell *matHeaderCellDef>Hiring Manager</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              {{ invitation.job.manager_id || 'Not assigned' }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <span class="status-badge" [ngClass]="getStatusClass(invitation.status)">
+                {{ invitation.status }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="sent_date">
+            <mat-header-cell *matHeaderCellDef>Sent Date</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              {{ invitation.created_at | date }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <button mat-button color="primary" 
+                      (click)="viewInvitationDetails(invitation.id)">
+                View Details
+              </button>
+              <button mat-button color="warn" 
+                      (click)="withdrawInvitation(invitation.id)"
+                      [disabled]="invitation.status !== 'pending'">
+                Withdraw
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="invitationColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: invitationColumns;"></mat-row>
+        </mat-table>
+      </div>
+    </mat-tab>
+
+    <!-- Recent Invitations Tab -->
+    <mat-tab label="Recent Invitations">
+      <div class="tab-content">
+        <mat-table [dataSource]="getRecentInvitations()">
+          <ng-container matColumnDef="employee_name">
+            <mat-header-cell *matHeaderCellDef>Employee</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <div class="employee-info">
+                <strong>{{ invitation.employee.name }}</strong>
+                <small>{{ invitation.employee.email }}</small>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="job_title">
+            <mat-header-cell *matHeaderCellDef>Position</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <div class="job-info">
+                <strong>{{ invitation.job.title }}</strong>
+                <small>{{ invitation.job.department }}</small>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="manager">
+            <mat-header-cell *matHeaderCellDef>Hiring Manager</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              {{ invitation.job.manager_id || 'Not assigned' }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <span class="status-badge" [ngClass]="getStatusClass(invitation.status)">
+                {{ invitation.status }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="sent_date">
+            <mat-header-cell *matHeaderCellDef>Sent Date</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              {{ invitation.created_at | date }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+            <mat-cell *matCellDef="let invitation">
+              <button mat-button routerLink="/invitations/{{ invitation.id }}">
+                View Details
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="invitationColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: invitationColumns;"></mat-row>
+        </mat-table>
+      </div>
+    </mat-tab>
+
+    <!-- All Jobs Tab -->
+    <mat-tab label="Job Management">
+      <div class="tab-content">
+        <div class="jobs-actions">
+          <button mat-raised-button color="primary" routerLink="/jobs/create">
+            <mat-icon>add</mat-icon>
+            Create New Job
+          </button>
+          <button mat-button routerLink="/admin/users">
+            <mat-icon>people</mat-icon>
+            Manage Users
+          </button>
+        </div>
+
+        <div class="jobs-grid">
+          <mat-card *ngFor="let job of allJobs" class="job-card">
+            <mat-card-header>
+              <mat-card-title>{{ job.title }}</mat-card-title>
+              <mat-card-subtitle>{{ job.team }}</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <p>{{ job.description | slice:0:150 }}...</p>
+              <div class="job-details">
+                <mat-chip-set>
+                  <mat-chip [ngClass]="getStatusClass(job.status)">
+                    {{ job.status }}
+                  </mat-chip>
+                </mat-chip-set>
+                <span><mat-icon>group</mat-icon> {{ job.team }}</span>
+                <span><mat-icon>schedule</mat-icon> {{ job.created_at | date:'shortDate' }}</span>
+              </div>
+            </mat-card-content>
+            
+            <mat-card-actions>
+              <button mat-button routerLink="/jobs/{{ job.id }}">View Details</button>
+              <button mat-button routerLink="/jobs/{{ job.id }}/edit">Edit</button>
+              <button mat-button color="primary" 
+                      (click)="discoverCandidates(job.id)"
+                      [disabled]="job.status !== 'active'">
+                <mat-icon>person_search</mat-icon>
+                Find Candidates
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -1,0 +1,235 @@
+.invitation-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    
+    p {
+      margin-top: 16px;
+      color: #666;
+    }
+  }
+
+  .detail-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+
+    .back-button {
+      margin-right: 8px;
+    }
+
+    h1 {
+      flex: 1;
+      margin: 0;
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    .status-chip-pending {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .status-chip-accepted {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .status-chip-declined {
+      background-color: #f44336;
+      color: white;
+    }
+  }
+
+  .section-card {
+    margin-bottom: 24px;
+
+    mat-card-header {
+      margin-bottom: 16px;
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 20px;
+        font-weight: 500;
+
+        mat-icon {
+          color: #1976d2;
+        }
+      }
+    }
+  }
+
+  .job-info {
+    h2 {
+      color: #1976d2;
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .team-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #666;
+      margin-bottom: 16px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .description {
+      margin: 24px 0;
+
+      h3 {
+        color: #333;
+        margin: 0 0 12px 0;
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      p {
+        line-height: 1.6;
+        color: #555;
+      }
+    }
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      strong {
+        color: #333;
+        font-weight: 500;
+      }
+
+      span {
+        color: #666;
+
+        &.job-title {
+          color: #888;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .skills-section {
+    margin: 24px 0;
+
+    h3 {
+      color: #333;
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .skills-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      mat-chip {
+        background-color: #e3f2fd;
+        color: #1976d2;
+      }
+    }
+  }
+
+  .personal-message, .response-reason {
+    margin: 24px 0;
+
+    h3 {
+      color: #333;
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .message-content, .response-content {
+      background-color: #f5f5f5;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid #1976d2;
+      line-height: 1.6;
+      color: #555;
+    }
+  }
+
+  .actions-section {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  .error-state {
+    text-align: center;
+    padding: 48px 24px;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #f44336;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      color: #333;
+      margin: 0 0 16px 0;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 24px;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .invitation-detail-container {
+    padding: 16px;
+
+    .detail-header {
+      h1 {
+        font-size: 24px;
+      }
+    }
+
+    .details-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .skills-chips {
+      justify-content: center;
+    }
+  }
+}

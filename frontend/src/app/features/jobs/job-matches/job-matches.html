@@ -1,0 +1,156 @@
+<div class="job-matches-container">
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <p>Loading job matches...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="matches-content">
+    <!-- Header -->
+    <div class="matches-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-info">
+        <h1>Candidate Matches</h1>
+        <h2 *ngIf="job">{{ job.title }} - {{ job.team }}</h2>
+        <p *ngIf="matches.length > 0">Found {{ matches.length }} potential candidates</p>
+      </div>
+    </div>
+
+    <!-- No matches state -->
+    <div *ngIf="matches.length === 0" class="no-matches">
+      <mat-icon>person_off</mat-icon>
+      <h3>No Matches Found</h3>
+      <p>No suitable candidates were found for this position. Consider reviewing the job requirements or expanding the search criteria.</p>
+      <button mat-raised-button color="primary" (click)="goBack()">
+        Back to Dashboard
+      </button>
+    </div>
+
+    <!-- Matches found -->
+    <div *ngIf="matches.length > 0" class="matches-list">
+      <!-- Bulk actions -->
+      <div class="bulk-actions">
+        <mat-checkbox 
+          (change)="$event ? masterToggle() : null"
+          [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()">
+          Select All
+        </mat-checkbox>
+        <span class="selected-count" *ngIf="selection.hasValue()">
+          {{ selection.selected.length }} selected
+        </span>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="inviteSelected()"
+                [disabled]="!selection.hasValue()">
+          <mat-icon>send</mat-icon>
+          Invite Selected ({{ selection.selected.length }})
+        </button>
+      </div>
+
+      <!-- Matches table -->
+      <mat-table [dataSource]="matches" class="matches-table">
+        <!-- Checkbox column -->
+        <ng-container matColumnDef="select">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-checkbox 
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <mat-checkbox 
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Employee name column -->
+        <ng-container matColumnDef="employee_name">
+          <mat-header-cell *matHeaderCellDef>Employee</mat-header-cell>
+          <mat-cell *matCellDef="let match">
+            <div class="employee-info">
+              <strong>{{ match.employee_name }}</strong>
+              <small>{{ match.employee_email }}</small>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Match score column -->
+        <ng-container matColumnDef="score">
+          <mat-header-cell *matHeaderCellDef>Match Score</mat-header-cell>
+          <mat-cell *matCellDef="let match">
+            <div class="score-display">
+              <div class="score-circle" [ngClass]="getScoreClass(match.score)">
+                {{ (match.score * 100) | number:'1.0-0' }}%
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Skills match column -->
+        <ng-container matColumnDef="skills_match">
+          <mat-header-cell *matHeaderCellDef>Matching Skills</mat-header-cell>
+          <mat-cell *matCellDef="let match">
+            <div class="skills-chips">
+              <mat-chip *ngFor="let skill of match.skills_match">
+                {{ skill }}
+              </mat-chip>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Explanation column -->
+        <ng-container matColumnDef="explanation">
+          <mat-header-cell *matHeaderCellDef>Match Explanation</mat-header-cell>
+          <mat-cell *matCellDef="let match">
+            <div class="explanation" *ngIf="match.explanation">
+              <div class="explanation-summary">
+                <strong>Experience Score:</strong> {{ (match.explanation.experience_score * 100) | number:'1.0-0' }}%
+              </div>
+              <div class="reasons" *ngIf="match.explanation.reasons?.length">
+                <ul>
+                  <li *ngFor="let reason of match.explanation.reasons.slice(0, 2)">{{ reason }}</li>
+                </ul>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Actions column -->
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+          <mat-cell *matCellDef="let match">
+            <button mat-button color="primary" (click)="inviteSingle(match)">
+              <mat-icon>send</mat-icon>
+              Invite
+            </button>
+            <button mat-button (click)="viewProfile(match.employee_id)">
+              <mat-icon>person</mat-icon>
+              Profile
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></mat-row>
+      </mat-table>
+    </div>
+
+    <!-- Actions bar -->
+    <div class="actions-bar" *ngIf="matches.length > 0">
+      <button mat-raised-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Dashboard
+      </button>
+      <button mat-raised-button color="accent" (click)="refreshMatches()">
+        <mat-icon>refresh</mat-icon>
+        Refresh Matches
+      </button>
+    </div>
+  </div>
+</div>

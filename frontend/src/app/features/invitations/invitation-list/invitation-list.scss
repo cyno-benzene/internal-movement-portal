@@ -1,0 +1,260 @@
+.invitations-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+
+    h2 {
+      margin: 0;
+      color: #333;
+    }
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .loading-state, .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: #666;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    h3 {
+      margin: 16px 0 8px 0;
+      color: #333;
+    }
+
+    p {
+      margin: 0;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+  }
+
+  .section {
+    margin-bottom: 48px;
+
+    .section-header {
+      margin-bottom: 24px;
+
+      h3 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        color: #333;
+        font-size: 20px;
+
+        mat-icon {
+          color: #666;
+        }
+
+        .pending-badge {
+          background: #ff9800;
+          color: white;
+          font-size: 12px;
+          margin-left: 8px;
+        }
+      }
+    }
+
+    .invitations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 24px;
+
+      .invitation-card {
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-left: 4px solid transparent;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        &.pending {
+          border-left-color: #ff9800;
+          background: #fff8e1;
+        }
+
+        &.accepted {
+          border-left-color: #4caf50;
+          background: #f1f8e9;
+        }
+
+        &.declined {
+          border-left-color: #f44336;
+          background: #ffebee;
+        }
+
+        mat-card-header {
+          .subtitle-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+
+            .status-chip {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              font-size: 12px;
+              padding: 4px 8px;
+
+              &.pending {
+                background: #ff9800;
+                color: white;
+              }
+
+              &.accepted {
+                background: #4caf50;
+                color: white;
+              }
+
+              &.declined {
+                background: #f44336;
+                color: white;
+              }
+
+              mat-icon {
+                font-size: 14px;
+                width: 14px;
+                height: 14px;
+              }
+            }
+          }
+        }
+
+        mat-card-content {
+          .job-description {
+            margin: 16px 0;
+            line-height: 1.5;
+            color: #333;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+
+          .invitation-meta {
+            margin: 16px 0;
+
+            > div {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin: 8px 0;
+              font-size: 14px;
+              color: #666;
+
+              mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+              }
+            }
+          }
+
+          .personal-message {
+            margin: 16px 0;
+            padding: 12px;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 4px;
+            font-style: italic;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+
+            mat-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+              color: #2196f3;
+              margin-top: 2px;
+            }
+
+            span {
+              flex: 1;
+              line-height: 1.4;
+            }
+          }
+        }
+
+        mat-card-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .pending-actions {
+            color: #666;
+            font-style: italic;
+            font-size: 14px;
+          }
+
+          button {
+            mat-icon {
+              margin-right: 4px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .invitations-container {
+    padding: 16px;
+
+    .header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      button {
+        align-self: center;
+      }
+    }
+
+    .section .invitations-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+
+      .invitation-card {
+        mat-card-header .subtitle-line {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        mat-card-actions {
+          flex-direction: column;
+          gap: 8px;
+
+          button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

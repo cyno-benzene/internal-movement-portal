@@ -1,0 +1,142 @@
+<div class="employee-dashboard">
+  <div class="welcome-header">
+    <h1>Welcome back, {{ currentUser?.name }}!</h1>
+    <p class="subtitle">Your personal internal mobility dashboard</p>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Profile Completion Card -->
+    <mat-card class="profile-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>person</mat-icon>
+          Profile Completion
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="progress-container">
+          <div class="progress-circle">
+            <span class="progress-text">{{ profileCompleteness }}%</span>
+          </div>
+          <div class="progress-info">
+            <p *ngIf="profileCompleteness < 100">
+              Complete your profile to be more discoverable by managers.
+            </p>
+            <p *ngIf="profileCompleteness === 100">
+              Your profile is complete! Great job.
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="updateProfile()">
+          <mat-icon>edit</mat-icon>
+          Update Profile
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Pending Invitations Card -->
+    <mat-card class="invitations-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon [matBadge]="pendingInvitations.length" matBadgeColor="warn" [matBadgeHidden]="pendingInvitations.length === 0">
+            mail
+          </mat-icon>
+          Pending Invitations
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="pendingInvitations.length === 0" class="empty-state">
+          <mat-icon>mail_outline</mat-icon>
+          <p>No pending invitations at the moment.</p>
+        </div>
+        <div *ngFor="let invitation of pendingInvitations" class="invitation-item">
+          <div class="invitation-info">
+            <h4>{{ invitation.job.title }}</h4>
+            <p>{{ invitation.job.team }} • From {{ invitation.inviter.name || 'Unknown' }}</p>
+            <small>Invited {{ formatDate(invitation.created_at) }}</small>
+          </div>
+          <div class="invitation-actions">
+            <button mat-button color="primary" routerLink="/invitations">
+              <mat-icon>visibility</mat-icon>
+              View
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions *ngIf="pendingInvitations.length > 0">
+        <button mat-button routerLink="/invitations">
+          View All Invitations
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Recent Activity Card -->
+    <mat-card class="activity-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Recent Activity
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="recentInvitations.length === 0" class="empty-state">
+          <mat-icon>timeline</mat-icon>
+          <p>No recent invitation activity.</p>
+        </div>
+        <div *ngFor="let invitation of recentInvitations" class="activity-item">
+          <div class="activity-icon">
+            <mat-icon [style.color]="getInvitationStatusColor(invitation.status)">
+              {{ getInvitationStatusIcon(invitation.status) }}
+            </mat-icon>
+          </div>
+          <div class="activity-info">
+            <h4>{{ invitation.job.title }}</h4>
+            <p>
+              {{ invitation.status === 'accepted' ? 'Accepted' : 'Declined' }} invitation from {{ invitation.inviter.name || 'Unknown' }}
+            </p>
+            <small>{{ formatDate(invitation.responded_at || invitation.created_at) }}</small>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions *ngIf="recentInvitations.length > 0">
+        <button mat-button routerLink="/invitations">
+          View All Activity
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Quick Actions Card -->
+    <mat-card class="actions-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>flash_on</mat-icon>
+          Quick Actions
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" routerLink="/invitations">
+            <mat-icon>mail</mat-icon>
+            My Invitations
+          </button>
+          <button mat-raised-button color="accent" (click)="updateProfile()">
+            <mat-icon>person</mat-icon>
+            Update Profile
+          </button>
+          <button mat-button routerLink="/notifications">
+            <mat-icon>notifications</mat-icon>
+            Notifications
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading overlay -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-icon>hourglass_empty</mat-icon>
+    <p>Loading your dashboard...</p>
+  </div>
+</div>
