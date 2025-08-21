@@ -35,9 +35,9 @@ class JobResponse(BaseModel):
     short_description: Optional[str] = None
     internal_notes: Optional[str] = None
     required_skills: List[str] = []
-    optional_skills: List[str] = []
-    min_years_experience: int = 0
-    preferred_certifications: List[str] = []
+    optional_skills: Optional[List[str]] = []
+    min_years_experience: Optional[int] = 0
+    preferred_certifications: Optional[List[str]] = []
     status: str
     visibility: str = "invite_only"
     manager_id: str
@@ -52,7 +52,7 @@ class JobMatchResponse(BaseModel):
     employee_name: str
     employee_email: str
     score: int
-    skills_match: List[str]
+    skills_match: List[str] = []
     
     class Config:
         from_attributes = True

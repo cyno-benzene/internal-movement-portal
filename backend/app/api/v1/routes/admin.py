@@ -8,14 +8,14 @@ from app.models.job import Job
 from app.models.application import Application
 from app.schemas.auth import UserResponse
 from app.schemas.employee import RoleUpdateRequest
-from app.api.v1.deps import require_admin
+from app.api.v1.deps import require_admin, require_hr_or_admin
 
 router = APIRouter()
 
 @router.get("/users", response_model=List[UserResponse])
 async def get_all_users(
     db: AsyncSession = Depends(get_db),
-    current_user: Employee = Depends(require_admin())
+    current_user: Employee = Depends(require_hr_or_admin())
 ):
     result = await db.execute(select(Employee))
     users = result.scalars().all()

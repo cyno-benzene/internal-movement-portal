@@ -32,6 +32,7 @@ class JobMatch(BaseModel):
     job_id = Column(UUID(as_uuid=True), ForeignKey("jobs.id"), nullable=False)
     employee_id = Column(UUID(as_uuid=True), ForeignKey("employees.id"), nullable=False)
     score = Column(Integer, default=0)
+    skills_match = Column(JSONB, default=list)  # List of matching skills
     explanation = Column(JSONB)  # per-feature contributions
     method = Column(String(50), default="rule_based")  # rule_based, semantic, hybrid, human_revised
     shortlisted = Column(Boolean, default=False)

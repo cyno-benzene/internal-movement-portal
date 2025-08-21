@@ -79,9 +79,9 @@ async def get_job(
         short_description=getattr(job, 'short_description', None),
         internal_notes=getattr(job, 'internal_notes', None),
         required_skills=job.required_skills or [],
-        optional_skills=getattr(job, 'optional_skills', []),
-        min_years_experience=getattr(job, 'min_years_experience', 0),
-        preferred_certifications=getattr(job, 'preferred_certifications', []),
+        optional_skills=getattr(job, 'optional_skills', None),
+        min_years_experience=getattr(job, 'min_years_experience', None),
+        preferred_certifications=getattr(job, 'preferred_certifications', None),
         status=job.status,
         visibility=getattr(job, 'visibility', 'invite_only'),
         manager_id=str(job.manager_id),
@@ -201,7 +201,7 @@ async def get_job_matches(
             employee_name=match.employee.name,
             employee_email=match.employee.email,
             score=match.score,
-            skills_match=match.employee.technical_skills
+            skills_match=getattr(match, 'skills_match', []) or []
         )
         for match in matches
     ]
