@@ -9,9 +9,12 @@ This directory contains scripts to set up the Internal Mobility Platform databas
 1. **Ensure PostgreSQL is running**
 2. **Create empty database:**
    ```sql
-   CREATE DATABASE internal_mobility;
+   CREATE DATABASE imp_db;
    CREATE USER mobility_user WITH PASSWORD 'your_password';
-   GRANT ALL PRIVILEGES ON DATABASE internal_mobility TO mobility_user;
+   GRANT USAGE ON SCHEMA public TO imp_user;
+   GRANT CREATE ON SCHEMA public TO imp_user;
+   ALTER DATABASE imp_db OWNER TO imp_user;
+   GRANT ALL PRIVILEGES ON DATABASE imp_db TO mobility_user;
    ```
 
 3. **Configure environment:**

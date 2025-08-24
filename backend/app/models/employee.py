@@ -29,7 +29,7 @@ class Employee(BaseModel):
     visibility_opt_out = Column(Boolean, default=False)  # if true: ineligible for discovery
     parsed_resume = Column(JSONB)  # raw structured output from parser
     
-    # Relationships
+    # Relationships (using string references to avoid circular imports)
     applications = relationship("Application", back_populates="employee")
     managed_jobs = relationship("Job", back_populates="manager")
     approvals = relationship("Approval", back_populates="approver")

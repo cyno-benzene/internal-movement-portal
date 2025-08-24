@@ -12,7 +12,7 @@ from app.schemas.job import JobCreate, JobUpdate, JobResponse, JobMatchResponse
 from app.schemas.employee import EmployeeResponse
 from app.api.v1.deps import get_current_user, require_manager_or_hr_or_admin, require_hr_or_admin, require_authenticated
 from app.services.job_service import JobService
-from app.services.match_service import MatchService
+from app.services.semantic_match_service import PureSemanticMatchService
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -168,7 +168,7 @@ async def trigger_matching(
     logger.info(f"HR user {current_user.employee_id} triggering matching for job_id: {job_id}")
     
     try:
-        match_service = MatchService(db)
+        match_service = PureSemanticMatchService(db)
         await match_service.trigger_job_matching(str(job_id))
         
         logger.info(f"Matching triggered successfully for job_id: {job_id}")
@@ -270,7 +270,7 @@ async def discover_candidates(
     
     # Calculate match scores if match service available
     try:
-        match_service = MatchService()
+        match_service = PureSemanticMatchService(db)
         scored_candidates = []
         
         for candidate in candidates:
@@ -356,7 +356,7 @@ async def shortlist_candidate(
     else:
         # Create new match record
         try:
-            match_service = MatchService()
+            match_service = PureSemanticMatchService(db)
             score = await match_service.calculate_match_score(job, employee, db)
         except Exception as e:
             logger.warning(f"Match scoring failed: {e}, using default score")

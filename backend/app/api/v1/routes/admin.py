@@ -9,6 +9,7 @@ from app.models.application import Application
 from app.schemas.auth import UserResponse
 from app.schemas.employee import RoleUpdateRequest
 from app.api.v1.deps import require_admin, require_hr_or_admin
+from app.services.semantic_match_service import PureSemanticMatchService
 
 router = APIRouter()
 
@@ -138,3 +139,25 @@ async def override_application_status(
     
     await db.commit()
     return {"message": "Application status overridden successfully"}
+
+@router.post("/retrain-matching-model")
+async def retrain_matching_model(
+    db: AsyncSession = Depends(get_db),
+    current_user: Employee = Depends(require_hr_or_admin())
+):
+    """Retrain the pure semantic matching model with current data (HR/Admin only)"""
+    match_service = PureSemanticMatchService(db)
+    result = await match_service.retrain_model()
+    
+    if result["status"] == "success":
+        return {
+            "message": "Pure semantic matching model retrained successfully",
+            "details": result
+        }
+    elif result["status"] == "insufficient_data":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Insufficient data for retraining. Need more jobs and employees. Current: {result}"
+        )
+    else:
+        raise HTTPException(status_code=500, detail="Model retraining failed")

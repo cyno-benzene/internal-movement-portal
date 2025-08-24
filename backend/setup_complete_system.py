@@ -80,7 +80,7 @@ TEST_USERS = [
         "technical_skills": ["Python", "JavaScript", "React", "SQL", "FastAPI"],
         "years_experience": 3,
         "location": "New York",
-        "current_role": "Software Developer",
+        "current_job_title": "Software Developer",
         "preferred_roles": ["Senior Developer", "Backend Developer"],
         "career_aspirations": "Looking to transition into a senior developer role with focus on backend systems.",
         "achievements": ["Built microservices architecture", "Led team of 3 developers"],
@@ -98,7 +98,7 @@ TEST_USERS = [
         "technical_skills": ["Java", "Spring Boot", "Microservices", "AWS", "Kubernetes"],
         "years_experience": 4,
         "location": "Austin",
-        "current_role": "Senior Developer",
+        "current_job_title": "Senior Developer",
         "preferred_roles": ["Cloud Architect", "DevOps Engineer"],
         "career_aspirations": "Interested in cloud architecture and distributed systems.",
         "achievements": ["Migrated legacy system to cloud", "Reduced deployment time by 80%"],
@@ -116,7 +116,7 @@ TEST_USERS = [
         "technical_skills": ["UI/UX Design", "Figma", "HTML/CSS", "React", "TypeScript"],
         "years_experience": 2,
         "location": "Seattle",
-        "current_role": "UX Designer",
+        "current_job_title": "UX Designer",
         "preferred_roles": ["Senior UX Designer", "Product Designer"],
         "career_aspirations": "Looking to grow as a full-stack designer with focus on user experience.",
         "achievements": ["Redesigned main product UI", "Improved user satisfaction by 25%"],
@@ -134,7 +134,7 @@ TEST_USERS = [
         "technical_skills": ["Python", "Machine Learning", "TensorFlow", "Data Science", "SQL"],
         "years_experience": 5,
         "location": "San Francisco",
-        "current_role": "Data Scientist",
+        "current_job_title": "Data Scientist",
         "preferred_roles": ["Senior Data Scientist", "ML Engineer"],
         "career_aspirations": "Seeking senior data scientist role to lead AI initiatives.",
         "achievements": ["Developed recommendation engine", "Published 3 ML research papers"],
@@ -152,7 +152,7 @@ TEST_USERS = [
         "technical_skills": ["DevOps", "Docker", "Kubernetes", "CI/CD", "AWS", "Terraform"],
         "years_experience": 6,
         "location": "Denver",
-        "current_role": "DevOps Engineer",
+        "current_job_title": "DevOps Engineer",
         "preferred_roles": ["Senior DevOps Engineer", "Platform Engineer"],
         "career_aspirations": "Looking to become platform engineering lead and drive infrastructure modernization.",
         "achievements": ["Implemented company-wide CI/CD", "Reduced infrastructure costs by 40%"],
@@ -170,7 +170,7 @@ TEST_USERS = [
         "technical_skills": ["React", "JavaScript", "Node.js", "GraphQL", "MongoDB"],
         "years_experience": 3,
         "location": "Portland",
-        "current_role": "Frontend Developer",
+        "current_job_title": "Frontend Developer",
         "preferred_roles": ["Full Stack Developer", "Frontend Lead"],
         "career_aspirations": "Interested in becoming a full-stack developer with leadership responsibilities.",
         "achievements": ["Led frontend redesign project", "Improved page load times by 40%"],
@@ -188,7 +188,7 @@ TEST_USERS = [
         "technical_skills": ["Project Management", "Agile", "Leadership", "Strategy", "Team Building"],
         "years_experience": 7,
         "location": "San Francisco",
-        "current_role": "Engineering Manager",
+        "current_job_title": "Engineering Manager",
         "preferred_roles": ["Director of Engineering", "VP Engineering"],
         "career_aspirations": "Seeking opportunities to lead larger teams and drive digital transformation initiatives.",
         "achievements": ["Led 50+ person engineering org", "Delivered 5 major product releases"],
@@ -206,7 +206,7 @@ TEST_USERS = [
         "technical_skills": ["Product Management", "Strategy", "Analytics", "Leadership"],
         "years_experience": 8,
         "location": "Boston",
-        "current_role": "Product Manager",
+        "current_job_title": "Product Manager",
         "preferred_roles": ["Senior Product Manager", "VP Product"],
         "career_aspirations": "Interested in VP of Product role to shape company product strategy.",
         "achievements": ["Launched 3 successful products", "Grew revenue by 200%"],
@@ -224,7 +224,7 @@ TEST_USERS = [
         "technical_skills": ["HR Analytics", "Recruitment", "Employee Relations", "HRIS", "Performance Management"],
         "years_experience": 5,
         "location": "Chicago",
-        "current_role": "HR Business Partner",
+        "current_job_title": "HR Business Partner",
         "preferred_roles": ["Senior HR Manager", "Director of People"],
         "career_aspirations": "Interested in expanding into organizational development and change management.",
         "achievements": ["Reduced hiring time by 50%", "Implemented new performance system"],
@@ -242,7 +242,7 @@ TEST_USERS = [
         "technical_skills": ["System Administration", "Security", "DevOps", "Database Management"],
         "years_experience": 10,
         "location": "Remote",
-        "current_role": "Systems Administrator",
+        "current_job_title": "Systems Administrator",
         "preferred_roles": ["Security Engineer", "Platform Architect"],
         "career_aspirations": "Looking to contribute to platform architecture and security initiatives.",
         "achievements": ["Implemented zero-trust security", "99.99% uptime achievement"],
@@ -370,7 +370,7 @@ async def run_migration(engine):
             # Job matches table - enhanced matching fields
             ("job_matches", "explanation", "TEXT"),
             ("job_matches", "shortlisted", "BOOLEAN DEFAULT FALSE"),
-            ("job_matches", "method", "VARCHAR(50) DEFAULT 'rule_based'"),
+            ("job_matches", "method", "VARCHAR(50) DEFAULT 'semantic'"),
             
             # Employees table - visibility and resume parsing
             ("employees", "visibility_opt_out", "BOOLEAN DEFAULT FALSE"),
@@ -425,7 +425,7 @@ async def create_test_users(session: AsyncSession):
             technical_skills=user_data["technical_skills"],
             years_experience=user_data["years_experience"],
             location=user_data["location"],
-            current_job_title=user_data["current_role"],
+            current_job_title=user_data["current_job_title"],
             preferred_roles=user_data["preferred_roles"],
             career_aspirations=user_data["career_aspirations"],
             achievements=user_data["achievements"],
@@ -604,25 +604,25 @@ async def create_sample_shortlists(session: AsyncSession, users: dict, jobs: dic
             "job_title": "Full Stack Developer",
             "employee_id": "EMP001",  # John Doe - has React and JS skills
             "score": 85.0,
-            "explanation": "Strong match: Has React, JavaScript, and backend experience with Python/FastAPI"
+            "explanation": "Semantic match: TF-IDF analysis shows strong content similarity in skills and experience"
         },
         {
             "job_title": "Full Stack Developer", 
             "employee_id": "EMP003",  # Sara Davis - has React and design skills
             "score": 78.0,
-            "explanation": "Good match: Strong frontend skills with React/TypeScript, excellent design background"
+            "explanation": "Semantic match: TF-IDF analysis indicates good content overlap between profile and requirements"
         },
         {
             "job_title": "Cloud Infrastructure Engineer",
             "employee_id": "EMP005",  # Lisa Brown - DevOps expert
             "score": 95.0,
-            "explanation": "Excellent match: Perfect skills alignment with Docker, Kubernetes, AWS, and Terraform"
+            "explanation": "Semantic match: TF-IDF cosine similarity shows excellent semantic alignment"
         },
         {
             "job_title": "Senior Backend Developer",
             "employee_id": "EMP002",  # Bob Wilson - Java/Microservices
             "score": 72.0,
-            "explanation": "Moderate match: Strong microservices experience, would need to learn Python/FastAPI"
+            "explanation": "Semantic match: Moderate TF-IDF similarity with some skill domain overlap identified"
         }
     ]
     
@@ -652,7 +652,8 @@ async def create_sample_shortlists(session: AsyncSession, users: dict, jobs: dic
             employee_id=employee.id,
             score=scenario["score"],
             explanation=scenario["explanation"],
-            shortlisted=True
+            shortlisted=True,
+            method="semantic"
         )
         
         session.add(job_match)
@@ -883,6 +884,35 @@ def print_credentials_and_instructions():
     print("• Invitation-response workflow instead of application workflow")
     print()
     
+    # Step 6: Test semantic matching system
+    print("🧠 Testing pure semantic matching system...")
+    try:
+        from app.services.semantic_match_service import PureSemanticMatchService
+        print("✅ PureSemanticMatchService imported successfully")
+        
+        # Test ML dependencies
+        import numpy as np
+        import sklearn
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
+        from sklearn.decomposition import TruncatedSVD
+        print("✅ All ML dependencies available")
+        
+        # Test basic functionality
+        vectorizer = TfidfVectorizer(ngram_range=(1, 2), max_features=100)
+        test_texts = ["python backend developer", "frontend react engineer"]
+        vectors = vectorizer.fit_transform(test_texts)
+        similarity = cosine_similarity(vectors[0:1], vectors[1:2])[0][0]
+        print(f"✅ Basic TF-IDF + cosine similarity working (test score: {similarity:.1%})")
+        print("✅ Pure semantic matching system ready!")
+        
+    except ImportError as e:
+        print(f"❌ Could not import dependencies: {e}")
+        print("💡 Run: pip install scikit-learn numpy")
+    except Exception as e:
+        print(f"❌ Semantic matching test failed: {e}")
+    
+    print()
     print("🚀 Ready to test! Start the backend server and try the workflows above.")
     print("="*80)
     print()
