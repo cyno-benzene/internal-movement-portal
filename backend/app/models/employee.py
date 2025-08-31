@@ -37,3 +37,4 @@ class Employee(BaseModel):
     matches = relationship("JobMatch", back_populates="employee")
     received_invitations = relationship("Invitation", foreign_keys="Invitation.employee_id", back_populates="employee")
     sent_invitations = relationship("Invitation", foreign_keys="Invitation.inviter_id", back_populates="inviter")
+    job_comments = relationship("JobComment", back_populates="author")

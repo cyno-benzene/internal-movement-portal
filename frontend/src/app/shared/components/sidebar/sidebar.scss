@@ -2,12 +2,39 @@
   width: 250px;
   height: 100%;
   padding: 0;
+  background-color: #fafafa;
+  border-right: 1px solid #e0e0e0;
+  
+  .mat-mdc-list-item {
+    margin: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+    
+    .mat-mdc-list-item-icon {
+      margin-right: 12px;
+      color: #666;
+    }
+    
+    .mdc-list-item__primary-text {
+      font-weight: 500;
+      color: #333;
+    }
+  }
 }
 
 .active {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(25, 118, 210, 0.1) !important;
   
-  .mat-icon {
-    color: var(--mat-primary-500);
+  .mat-mdc-list-item-icon {
+    color: var(--mat-primary-500) !important;
+  }
+  
+  .mdc-list-item__primary-text {
+    color: var(--mat-primary-500) !important;
+    font-weight: 600 !important;
   }
 }

@@ -6,40 +6,38 @@ class JobCreate(BaseModel):
     title: str
     team: str
     description: str
-    short_description: Optional[str] = None
-    internal_notes: Optional[str] = None
+    note: Optional[str] = None
     required_skills: List[str]
     optional_skills: Optional[List[str]] = None
     min_years_experience: Optional[int] = 0
     preferred_certifications: Optional[List[str]] = None
-    visibility: Optional[str] = "invite_only"
+    priority: Optional[str] = "normal"  # normal, high_importance
 
 class JobUpdate(BaseModel):
     title: Optional[str] = None
     team: Optional[str] = None
     description: Optional[str] = None
-    short_description: Optional[str] = None
-    internal_notes: Optional[str] = None
+    note: Optional[str] = None
     required_skills: Optional[List[str]] = None
     optional_skills: Optional[List[str]] = None
     min_years_experience: Optional[int] = None
     preferred_certifications: Optional[List[str]] = None
+    priority: Optional[str] = None  # normal, high_importance
     status: Optional[str] = None
-    visibility: Optional[str] = None
 
 class JobResponse(BaseModel):
     id: str
     title: str
     team: str
     description: str
-    short_description: Optional[str] = None
-    internal_notes: Optional[str] = None
+    note: Optional[str] = None
     required_skills: List[str] = []
     optional_skills: Optional[List[str]] = []
     min_years_experience: Optional[int] = 0
     preferred_certifications: Optional[List[str]] = []
+    priority: Optional[str] = "normal"  # normal, high_importance
     status: str
-    visibility: str = "invite_only"
+    matching_status: Optional[str] = "not_matched"  # not_matched, matching, matched
     manager_id: str
     manager_name: str
     created_at: datetime

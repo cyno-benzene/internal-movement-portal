@@ -5,7 +5,7 @@
 }
 
 .stats-grid {
-  margin-bottom: 30px;
+  margin-bottom: 0px;
 }
 
 .stats-card {
@@ -129,6 +129,24 @@
   }
 }
 
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priority-flag {
+  display: flex;
+  align-items: center;
+  
+  .priority-icon {
+    color: #ff5722;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .status-badge {
   padding: 4px 12px;
   border-radius: 12px;
@@ -189,7 +207,7 @@ mat-table {
   
   mat-header-cell,
   mat-cell {
-    padding: 12px 8px;
+    padding: 8px;
   }
   
   mat-cell {
@@ -245,4 +263,75 @@ mat-table {
   .job-info {
     font-size: 0.8rem;
   }
+}
+
+// Simplified job management styles
+.jobs-table {
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+  
+  .job-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    strong {
+      font-weight: 500;
+      color: #333;
+    }
+    
+    small {
+      color: #666;
+      font-size: 0.8rem;
+    }
+  }
+  
+  .candidates-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+    
+    &.pending {
+      color: #ff9800;
+    }
+    
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.view-all-container {
+  display: flex;
+  justify-content: center;
+  
+  .view-all-btn {
+    width: -webkit-fill-available;
+    width: -moz-available;
+    width: stretch;
+    border-left: none;
+    border-right: none;
+    border-color: rgba(0, 0, 0, 0.12); // A light grey, similar to Material table dividers
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Update tab content spacing for job management
+.dashboard-tabs .tab-content h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-weight: 500;
+  font-size: 1.1rem;
 }

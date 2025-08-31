@@ -28,33 +28,23 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>Status</th>
           <td mat-cell *matCellDef="let job">
-            <span class="status-badge" [ngClass]="job.status">{{ job.status }}</span>
+            <div class="status-container">
+              <span class="status-badge" [ngClass]="job.status">{{ job.status }}</span>
+              <span *ngIf="job.priority === 'high_importance'" class="priority-flag" matTooltip="High Importance">
+                <mat-icon class="priority-icon">priority_high</mat-icon>
+              </span>
+              <span *ngIf="job.matching_status === 'matched'" class="matched-flag" matTooltip="Candidates Available">
+                <mat-icon class="matched-icon">group</mat-icon>
+              </span>
+            </div>
           </td>
         </ng-container>
 
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef> Actions </th>
-          <td mat-cell *matCellDef="let job">
-            <button mat-icon-button (click)="viewJob(job)" matTooltip="View Details">
-              <mat-icon>visibility</mat-icon>
-            </button>
-            <ng-container *ngIf="canManageJob(job)">
-              <a mat-icon-button [routerLink]="['/jobs/edit', job.id]" matTooltip="Edit Job">
-                <mat-icon>edit</mat-icon>
-              </a>
-              <button mat-icon-button (click)="deleteJob(job)" matTooltip="Delete Job">
-                <mat-icon>delete</mat-icon>
-              </button>
-              <!-- Only HR can trigger matching -->
-              <button mat-icon-button (click)="triggerMatching(job)" matTooltip="Find Matching Candidates" 
-                      *ngIf="canTriggerMatching()">
-                <mat-icon>group_add</mat-icon>
-              </button>
-            </ng-container>
-          </td>
-        </ng-container>        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+            class="clickable-row"
+            (click)="viewJob(row)"
+            matRipple></tr>
       </table>
     </mat-card-content>
   </mat-card>

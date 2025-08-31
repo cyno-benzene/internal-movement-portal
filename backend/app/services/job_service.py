@@ -18,7 +18,12 @@ class JobService:
             title=job_data.title,
             team=job_data.team,
             description=job_data.description,
+            note=job_data.note,
             required_skills=job_data.required_skills,
+            optional_skills=job_data.optional_skills,
+            min_years_experience=job_data.min_years_experience,
+            preferred_certifications=job_data.preferred_certifications,
+            priority=job_data.priority or "normal",
             manager_id=manager_id,
             status="open"
         )
@@ -64,8 +69,18 @@ class JobService:
             job.team = job_data.team
         if job_data.description is not None:
             job.description = job_data.description
+        if job_data.note is not None:
+            job.note = job_data.note
         if job_data.required_skills is not None:
             job.required_skills = job_data.required_skills
+        if job_data.optional_skills is not None:
+            job.optional_skills = job_data.optional_skills
+        if job_data.min_years_experience is not None:
+            job.min_years_experience = job_data.min_years_experience
+        if job_data.preferred_certifications is not None:
+            job.preferred_certifications = job_data.preferred_certifications
+        if job_data.priority is not None:
+            job.priority = job_data.priority
         if job_data.status is not None:
             job.status = job_data.status
         

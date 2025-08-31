@@ -13,7 +13,12 @@
       </mat-card-header>
       <mat-card-content>
         <div class="job-meta">
-          <span class="status-badge" [ngClass]="job.status">{{ job.status | titlecase }}</span>
+          <div class="status-container">
+            <span class="status-badge" [ngClass]="job.status">{{ job.status | titlecase }}</span>
+            <span *ngIf="job.priority === 'high_importance'" class="priority-flag" matTooltip="High Importance">
+              <mat-icon class="priority-icon">priority_high</mat-icon>
+            </span>
+          </div>
           <span class="manager-info">
             <mat-icon>person</mat-icon>
             Manager: {{ job.manager_name }}
@@ -29,79 +34,93 @@
           <mat-icon>arrow_back</mat-icon>
           Back to Jobs
         </button>
-        <button mat-raised-button color="primary" (click)="editJob()" *ngIf="canManageJob()">
+        <button mat-raised-button color="primary" (click)="editJob()" *ngIf="canEditJob()">
           <mat-icon>edit</mat-icon>
           Edit Job
         </button>
+        <button mat-raised-button color="warn" (click)="triggerMatching()" 
+                *ngIf="(currentUser?.role === 'hr' || currentUser?.role === 'admin') && job.matching_status !== 'matched'">
+          <mat-icon>person_search</mat-icon>
+          Find Candidates
+        </button>
         <button mat-raised-button color="accent" (click)="viewMatches()" 
-                *ngIf="currentUser?.role === 'hr' || currentUser?.role === 'admin'">
+                *ngIf="(currentUser?.role === 'hr' || currentUser?.role === 'admin') && job.matching_status === 'matched'">
           <mat-icon>group</mat-icon>
           View Matches
         </button>
       </mat-card-actions>
     </mat-card>
 
-    <!-- Job Description -->
-    <mat-card class="job-description">
-      <mat-card-header>
-        <mat-card-title>Job Description</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <p>{{ job.description }}</p>
-        <div *ngIf="job.short_description" class="short-description">
-          <h4>Summary</h4>
-          <p>{{ job.short_description }}</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      <!-- Left Column -->
+      <div class="left-column">
+        <!-- Job Description -->
+        <mat-card class="job-description">
+          <mat-card-header>
+            <mat-card-title>Job Description</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ job.description }}</p>
+          </mat-card-content>
+        </mat-card>
 
-    <!-- Requirements -->
-    <mat-card class="job-requirements">
-      <mat-card-header>
-        <mat-card-title>Requirements</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="requirement-section" *ngIf="job.required_skills && job.required_skills.length > 0">
-          <h4>Required Skills</h4>
-          <mat-chip-set>
-            <mat-chip *ngFor="let skill of job.required_skills">{{ skill }}</mat-chip>
-          </mat-chip-set>
-        </div>
-        
-        <div class="requirement-section" *ngIf="job.optional_skills && job.optional_skills.length > 0">
-          <h4>Preferred Skills</h4>
-          <mat-chip-set>
-            <mat-chip *ngFor="let skill of job.optional_skills" color="accent" variant="outlined">{{ skill }}</mat-chip>
-          </mat-chip-set>
-        </div>
+        <!-- Manager Notes (Manager/HR only) -->
+        <mat-card class="notes" *ngIf="job.note && canManageJob()">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>lock</mat-icon>
+              Note
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ job.note }}</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
 
-        <div class="requirement-section" *ngIf="job.min_years_experience">
-          <h4>Experience Required</h4>
-          <p><mat-icon>work</mat-icon> {{ job.min_years_experience }} years minimum</p>
-        </div>
+      <!-- Right Column -->
+      <div class="right-column">
+        <!-- Requirements -->
+        <mat-card class="job-requirements">
+          <mat-card-header>
+            <mat-card-title>Requirements</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="requirement-section" *ngIf="job.required_skills && job.required_skills.length > 0">
+              <h4>Technical Skills</h4>
+              <mat-chip-set>
+                <mat-chip *ngFor="let skill of job.required_skills">{{ skill }}</mat-chip>
+              </mat-chip-set>
+            </div>
+            
+            <div class="requirement-section" *ngIf="job.optional_skills && job.optional_skills.length > 0">
+              <h4>Preferred Skills</h4>
+              <mat-chip-set>
+                <mat-chip *ngFor="let skill of job.optional_skills" color="accent" variant="outlined">{{ skill }}</mat-chip>
+              </mat-chip-set>
+            </div>
 
-        <div class="requirement-section" *ngIf="job.preferred_certifications && job.preferred_certifications.length > 0">
-          <h4>Preferred Certifications</h4>
-          <mat-chip-set>
-            <mat-chip *ngFor="let cert of job.preferred_certifications" color="primary" variant="outlined">{{ cert }}</mat-chip>
-          </mat-chip-set>
-        </div>
-      </mat-card-content>
-    </mat-card>
+            <div class="requirement-section" *ngIf="job.min_years_experience">
+              <h4>Experience Required</h4>
+              <p><mat-icon>work</mat-icon> {{ job.min_years_experience }} years minimum</p>
+            </div>
 
-    <!-- Internal Notes (Manager/HR only) -->
-    <mat-card class="internal-notes" *ngIf="job.internal_notes && canManageJob()">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>lock</mat-icon>
-          Internal Notes
-        </mat-card-title>
-        <mat-card-subtitle>Visible to managers and HR only</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p>{{ job.internal_notes }}</p>
-      </mat-card-content>
-    </mat-card>
+            <div class="requirement-section" *ngIf="job.preferred_certifications && job.preferred_certifications.length > 0">
+              <h4>Preferred Certifications</h4>
+              <mat-chip-set>
+                <mat-chip *ngFor="let cert of job.preferred_certifications" color="primary" variant="outlined">{{ cert }}</mat-chip>
+              </mat-chip-set>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+            <!-- Job Comments Section (Manager/HR/Admin only) -->
+        <app-job-comments 
+          *ngIf="canViewComments()" 
+          [jobId]="job.id">
+        </app-job-comments>
   </div>
 
   <div *ngIf="!isLoading && !job" class="error-state">

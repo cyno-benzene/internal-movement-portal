@@ -7,34 +7,33 @@ This script handles BOTH fresh database setup and existing database upgrades:
 
 🆕 FRESH DATABASE:
 - Creates all tables from scratch using SQLAlchemy models
-- Sets up complete invite-only system schema
+- Sets up complete system schema
 - Populates with comprehensive test data
 
 🔄 EXISTING DATABASE:
-- Adds missing tables (invitations, invitation_decisions)
-- Adds new columns for invite-only features
+- Adds missing tables (invitations, invitation_decisions, job_comments)
+- Adds new columns for features
 - Preserves existing data
 - Updates schema to latest version
 
 📋 WHAT IT DOES:
 1. Database Migration:
    - Creates all tables if they don't exist
-   - Adds invite-only system tables (invitations, invitation_decisions)
-   - Adds new columns (short_description, visibility, etc.)
+   - Adds system tables (invitations, invitation_decisions, job_comments)
+   - Adds new columns (note, optional_skills, etc.)
    - Handles PostgreSQL-specific features
 
 2. Test Data Creation:
    - 10 users (employees, managers, HR, admin)
-   - 6 invite-only jobs with realistic descriptions
+   - 6 jobs with realistic descriptions
    - Sample invitations with different statuses
    - Shortlisted candidates for discovery workflow
    - Notifications for different user types
 
-3. Invite-Only Workflow Setup:
-   - Jobs with visibility='invite_only'
+3. System Workflow Setup:
    - Employee opt-out capabilities
    - Manager discovery and shortlist workflow
-   - Invitation-response system instead of applications
+   - Invitation-response system
 
 🚀 USAGE:
 - For fresh setup: Just run this script
@@ -63,11 +62,11 @@ from app.core.config import settings
 from app.core.security import get_password_hash
 from app.db.base import Base
 from app.models.employee import Employee
-from app.models.job import Job
+from app.models.job import Job, JobMatch
 from app.models.application import Application
 from app.models.notification import Notification
 from app.models.invitation import Invitation, InvitationDecision
-from app.models.job import JobMatch
+from app.models.job_comment import JobComment
 
 # Test users data for invite-only system
 TEST_USERS = [
@@ -259,91 +258,79 @@ TEST_JOBS = [
         "title": "Senior Backend Developer",
         "team": "Platform Engineering",
         "description": "We're looking for a senior backend developer to join our platform team. You'll be responsible for building scalable APIs and microservices using Python and FastAPI.",
-        "short_description": "Senior backend role focusing on APIs and microservices",
         "required_skills": ["Python", "FastAPI", "Microservices", "SQL", "AWS"],
         "optional_skills": ["Docker", "Kubernetes", "Redis"],
         "min_years_experience": 3,
         "preferred_certifications": ["AWS Solutions Architect"],
         "status": "open",
-        "visibility": "invite_only",
-        "internal_notes": "Looking for someone with strong Python background who can mentor junior developers",
+        "note": "Looking for someone with strong Python background who can mentor junior developers",
         "manager_employee_id": "MGR001"
     },
     {
         "title": "Full Stack Developer",
         "team": "Product Development",
         "description": "Join our product team to build user-facing features. You'll work on both frontend (React) and backend (Java/Spring) development.",
-        "short_description": "Full-stack role with React frontend and Java backend",
         "required_skills": ["React", "JavaScript", "Java", "Spring Boot", "SQL"],
         "optional_skills": ["TypeScript", "GraphQL", "AWS"],
         "min_years_experience": 2,
         "preferred_certifications": ["Oracle Java Certification"],
         "status": "open",
-        "visibility": "invite_only",
-        "internal_notes": "Need someone who can work across the stack and collaborate well with design team",
+        "note": "Need someone who can work across the stack and collaborate well with design team",
         "manager_employee_id": "MGR002"
     },
     {
         "title": "Cloud Infrastructure Engineer",
         "team": "DevOps",
         "description": "Help us scale our cloud infrastructure. You'll work with Kubernetes, AWS, and Infrastructure as Code to support our growing platform.",
-        "short_description": "Cloud infrastructure role with Kubernetes and AWS focus",
         "required_skills": ["Kubernetes", "AWS", "Terraform", "Docker", "CI/CD"],
         "optional_skills": ["Helm", "Monitoring", "Security"],
         "min_years_experience": 4,
         "preferred_certifications": ["AWS Solutions Architect Professional", "Kubernetes Administrator"],
         "status": "open",
-        "visibility": "invite_only",
-        "internal_notes": "Critical role for scaling - need someone with production Kubernetes experience",
+        "note": "Critical role for scaling - need someone with production Kubernetes experience",
         "manager_employee_id": "MGR001"
     },
     {
         "title": "Data Scientist - AI/ML",
         "team": "Data Science",
         "description": "Lead our machine learning initiatives. Build recommendation systems, predictive models, and help drive data-driven decisions.",
-        "short_description": "Senior ML role for recommendation systems and predictive models",
         "required_skills": ["Python", "Machine Learning", "TensorFlow", "Data Science", "Statistics"],
         "optional_skills": ["PyTorch", "MLOps", "Spark"],
         "min_years_experience": 4,
         "preferred_certifications": ["Google Cloud ML Engineer"],
         "status": "open",
-        "visibility": "invite_only",
-        "internal_notes": "Looking for PhD or equivalent experience, must have production ML experience",
+        "note": "Looking for PhD or equivalent experience, must have production ML experience",
         "manager_employee_id": "MGR002"
     },
     {
         "title": "Senior UX Designer",
         "team": "Design",
         "description": "Design intuitive user experiences for our platform. You'll work closely with product and engineering teams.",
-        "short_description": "Senior UX role with focus on platform design",
         "required_skills": ["UI/UX Design", "Figma", "User Research", "Prototyping"],
         "optional_skills": ["HTML/CSS", "React", "Design Systems"],
         "min_years_experience": 3,
         "preferred_certifications": ["Google UX Design Certificate"],
         "status": "open",
-        "visibility": "invite_only",
-        "internal_notes": "Need someone who can establish design systems and lead junior designers",
+        "note": "Need someone who can establish design systems and lead junior designers",
         "manager_employee_id": "MGR001"
     },
     {
         "title": "Platform Engineering Lead",
         "team": "Platform Engineering", 
         "description": "Lead our DevOps practices and help modernize our deployment pipeline. Focus on automation and reliability.",
-        "short_description": "Leadership role in platform engineering and DevOps",
         "required_skills": ["DevOps", "Kubernetes", "CI/CD", "AWS", "Leadership"],
         "optional_skills": ["Terraform", "Monitoring", "Security"],
         "min_years_experience": 6,
         "preferred_certifications": ["AWS DevOps Engineer Professional"],
         "status": "open",
-        "visibility": "invite_only",
-        "internal_notes": "Senior role - need someone who can lead a team and drive platform strategy",
+        "note": "Senior role - need someone who can lead a team and drive platform strategy",
         "manager_employee_id": "MGR001"
     }
 ]
 
 async def run_migration(engine):
-    """Run database migration to add invitation system"""
-    print("🔄 Running database migration for invite-only system...")
+    """Run database migration to add latest system features"""
+    print("🔄 Running database migration for system features...")
     
     try:
         # First, try to connect and check if database exists
@@ -359,13 +346,11 @@ async def run_migration(engine):
             
         # Add missing columns to existing tables (for upgrade scenarios)
         columns_to_add = [
-            # Jobs table - new invite-only fields
-            ("jobs", "short_description", "TEXT"),
-            ("jobs", "internal_notes", "TEXT"),
+            # Jobs table - updated fields (note: removed old fields like internal_notes, short_description, visibility)
+            ("jobs", "note", "TEXT"),
             ("jobs", "optional_skills", "JSON"),
-            ("jobs", "min_years_experience", "INTEGER"),
+            ("jobs", "min_years_experience", "INTEGER DEFAULT 0"),
             ("jobs", "preferred_certifications", "JSON"),
-            ("jobs", "visibility", "VARCHAR(20) DEFAULT 'open'"),
             
             # Job matches table - enhanced matching fields
             ("job_matches", "explanation", "TEXT"),
@@ -379,7 +364,7 @@ async def run_migration(engine):
             ("employees", "preferred_roles", "JSON"),
         ]
         
-        print("📝 Adding/verifying additional columns for invite-only features...")
+        print("📝 Adding/verifying additional columns...")
         async with engine.begin() as conn:
             for table, column, column_type in columns_to_add:
                 try:
@@ -389,6 +374,22 @@ async def run_migration(engine):
                 except Exception as e:
                     # This is expected for columns that already exist
                     print(f"ℹ️  Column {column} in {table}: {str(e)[:50]}...")
+            
+            # Clean up old columns that are no longer used (safe to fail)
+            old_columns_to_remove = [
+                ("jobs", "internal_notes"),
+                ("jobs", "short_description"), 
+                ("jobs", "visibility")
+            ]
+            
+            print("🧹 Cleaning up deprecated columns...")
+            for table, column in old_columns_to_remove:
+                try:
+                    query = f"ALTER TABLE {table} DROP COLUMN IF EXISTS {column}"
+                    await conn.execute(text(query))
+                    print(f"✅ Removed deprecated column {column} from {table}")
+                except Exception as e:
+                    print(f"ℹ️  Column {column} cleanup: {str(e)[:50]}...")
         
         print("✅ Database migration completed successfully!")
         print("✅ System ready for fresh database or existing database upgrade!")
@@ -475,14 +476,12 @@ async def create_test_jobs(session: AsyncSession, users: dict):
             title=job_data["title"],
             team=job_data["team"],
             description=job_data["description"],
-            short_description=job_data["short_description"],
             required_skills=job_data["required_skills"],
             optional_skills=job_data["optional_skills"],
             min_years_experience=job_data["min_years_experience"],
             preferred_certifications=job_data["preferred_certifications"],
             status=job_data["status"],
-            visibility=job_data["visibility"],
-            internal_notes=job_data["internal_notes"],
+            note=job_data["note"],
             manager_id=manager.id
         )
         
@@ -875,13 +874,13 @@ def print_credentials_and_instructions():
     print("• 1 Employee opted out of discovery (EMP006)")
     print()
     
-    print("🎯 KEY WORKFLOW DIFFERENCES:")
-    print("• Employees cannot browse or apply to jobs")
-    print("• Only managers/HR can discover and invite candidates")
-    print("• Jobs have visibility='invite_only'")
-    print("• Employees only see jobs they're invited to")
-    print("• Shortlisting workflow for managers to curate candidates")
-    print("• Invitation-response workflow instead of application workflow")
+    print("🎯 KEY WORKFLOW FEATURES:")
+    print("• Complete job creation and application system")
+    print("• Enhanced job matching with semantic capabilities")
+    print("• Comprehensive employee profiles with skills")
+    print("• Admin management and notification system")
+    print("• Role-based access control and authentication")
+    print("• Application tracking and status management")
     print()
     
     # Step 6: Test semantic matching system
@@ -931,7 +930,7 @@ def print_credentials_and_instructions():
     print("🔄 For existing database upgrade:")
     print("   • Just run this script - it safely adds missing features")
     print("   • Existing data is preserved")
-    print("   • New invite-only features are added")
+    print("   • Enhanced system features are added")
     print("="*80)
 
 if __name__ == "__main__":

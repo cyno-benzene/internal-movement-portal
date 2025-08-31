@@ -56,7 +56,7 @@ export class ProfileManagementComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       technical_skills: this.formBuilder.array([]),
       achievements: this.formBuilder.array([]),
-      years_experience: [0, [Validators.min(0)]],
+      years_experience: [0, [Validators.min(0), Validators.max(50)]],
       past_companies: this.formBuilder.array([]),
       certifications: this.formBuilder.array([]),
       education: this.formBuilder.array([]),
@@ -71,6 +71,7 @@ export class ProfileManagementComponent implements OnInit {
       this.isLoading = true;
       this.apiService.getMyProfile().subscribe({
         next: (profile) => {
+          console.log('Loaded profile:', profile); // Debug log
           this.userProfile = profile;
           this.populateForm(profile);
         },
@@ -98,23 +99,74 @@ export class ProfileManagementComponent implements OnInit {
       location: profile.location || ''
     });
 
-    // Populate arrays
-    this.setArrayField('technical_skills', profile.technical_skills || []);
-    this.setArrayField('achievements', profile.achievements || []);
-    this.setArrayField('certifications', profile.certifications || []);
-    this.setArrayField('publications', profile.publications || []);
-    this.setArrayField('past_companies', profile.past_companies || []);
-    this.setArrayField('education', profile.education || []);
+    // Populate arrays with proper fallbacks
+    this.setArrayField('technical_skills', this.ensureArray(profile.technical_skills));
+    this.setArrayField('achievements', this.ensureArray(profile.achievements));
+    this.setArrayField('certifications', this.ensureArray(profile.certifications));
+    this.setArrayField('publications', this.ensureArray(profile.publications));
+    this.setArrayField('past_companies', this.ensureArray(profile.past_companies));
+    this.setArrayField('education', this.ensureArray(profile.education));
+  }
+
+  private ensureArray(value: any): any[] {
+    if (Array.isArray(value)) {
+      return value;
+    } else if (value === null || value === undefined) {
+      return [];
+    } else {
+      // If it's a single value, wrap it in an array
+      return [value];
+    }
   }
 
   private setArrayField(fieldName: string, values: any[]): void {
     const formArray = this.profileForm.get(fieldName) as FormArray;
     formArray.clear();
+    
+    console.log(`Setting ${fieldName}:`, values); // Debug log
+    
     values.forEach(value => {
-      if (typeof value === 'string') {
-        formArray.push(this.formBuilder.control(value));
+      if (fieldName === 'past_companies') {
+        // Handle past_companies - can be string or object
+        if (typeof value === 'string') {
+          // Convert string to object format
+          formArray.push(this.formBuilder.group({
+            name: [value],
+            position: [''],
+            duration: ['']
+          }));
+        } else if (value && typeof value === 'object') {
+          formArray.push(this.formBuilder.group({
+            name: [value.name || ''],
+            position: [value.position || ''],
+            duration: [value.duration || '']
+          }));
+        }
+      } else if (fieldName === 'education') {
+        // Handle education - can be string or object
+        if (typeof value === 'string') {
+          // Convert string to object format
+          formArray.push(this.formBuilder.group({
+            institution: [value],
+            degree: [''],
+            field_of_study: [''],
+            graduation_year: ['']
+          }));
+        } else if (value && typeof value === 'object') {
+          formArray.push(this.formBuilder.group({
+            institution: [value.institution || ''],
+            degree: [value.degree || ''],
+            field_of_study: [value.field_of_study || ''],
+            graduation_year: [value.graduation_year || '']
+          }));
+        }
       } else {
-        formArray.push(this.formBuilder.group(value));
+        // Handle simple string arrays (technical_skills, achievements, etc.)
+        if (typeof value === 'string') {
+          formArray.push(this.formBuilder.control(value));
+        } else {
+          formArray.push(this.formBuilder.control(value || ''));
+        }
       }
     });
   }
@@ -179,7 +231,7 @@ export class ProfileManagementComponent implements OnInit {
 
   addCompany(): void {
     this.pastCompanies.push(this.formBuilder.group({
-      name: [''],
+      name: ['', Validators.required],
       position: [''],
       duration: ['']
     }));
@@ -191,7 +243,7 @@ export class ProfileManagementComponent implements OnInit {
 
   addEducation(): void {
     this.education.push(this.formBuilder.group({
-      institution: [''],
+      institution: ['', Validators.required],
       degree: [''],
       field_of_study: [''],
       graduation_year: ['']
@@ -208,11 +260,48 @@ export class ProfileManagementComponent implements OnInit {
         this.isSaving = true;
         const formValue = this.profileForm.value;
         
-        // Filter out empty values from arrays
-        formValue.technical_skills = formValue.technical_skills.filter((skill: string) => skill.trim());
-        formValue.achievements = formValue.achievements.filter((achievement: string) => achievement.trim());
-        formValue.certifications = formValue.certifications.filter((cert: string) => cert.trim());
-        formValue.publications = formValue.publications.filter((pub: string) => pub.trim());
+        // Filter out empty values from simple string arrays
+        formValue.technical_skills = formValue.technical_skills.filter((skill: string) => skill && skill.trim());
+        formValue.achievements = formValue.achievements.filter((achievement: string) => achievement && achievement.trim());
+        formValue.certifications = formValue.certifications.filter((cert: string) => cert && cert.trim());
+        formValue.publications = formValue.publications.filter((pub: string) => pub && pub.trim());
+
+        // Handle past_companies - convert to backend format
+        if (formValue.past_companies) {
+          formValue.past_companies = formValue.past_companies
+            .filter((company: any) => company && (company.name || company.position || company.duration))
+            .map((company: any) => {
+              // If all fields are filled, send as object, otherwise send as string (company name)
+              if (company.position || company.duration) {
+                return {
+                  name: company.name || '',
+                  position: company.position || '',
+                  duration: company.duration || ''
+                };
+              } else {
+                return company.name || '';
+              }
+            });
+        }
+
+        // Handle education - convert to backend format  
+        if (formValue.education) {
+          formValue.education = formValue.education
+            .filter((edu: any) => edu && (edu.institution || edu.degree || edu.field_of_study || edu.graduation_year))
+            .map((edu: any) => {
+              // If all fields are filled, send as object, otherwise send as string (institution name)
+              if (edu.degree || edu.field_of_study || edu.graduation_year) {
+                return {
+                  institution: edu.institution || '',
+                  degree: edu.degree || '',
+                  field_of_study: edu.field_of_study || '',
+                  graduation_year: edu.graduation_year || ''
+                };
+              } else {
+                return edu.institution || '';
+              }
+            });
+        }
 
         this.apiService.updateMyProfile(formValue).subscribe({
           next: (updatedProfile) => {
@@ -247,5 +336,17 @@ export class ProfileManagementComponent implements OnInit {
       duration: 3000,
       panelClass: ['error-snackbar']
     });
+  }
+
+  // Helper method to safely get form control values
+  getFormControlValue(controlName: string): any {
+    const control = this.profileForm.get(controlName);
+    return control ? control.value : null;
+  }
+
+  // Helper method to check if a form array has valid entries
+  hasValidEntries(arrayName: string): boolean {
+    const formArray = this.profileForm.get(arrayName) as FormArray;
+    return formArray && formArray.length > 0;
   }
 }

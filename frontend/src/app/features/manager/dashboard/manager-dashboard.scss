@@ -1,11 +1,11 @@
 .dashboard-container {
   padding: 20px;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
 .stats-grid {
-  margin-bottom: 30px;
+  margin-bottom: 0px;
 }
 
 .stats-card {
@@ -25,6 +25,7 @@
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 5px;
+  color: #333;
   
   &.pending {
     color: #ff9800;
@@ -40,14 +41,14 @@
 }
 
 .stat-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .dashboard-tabs {
-  .mat-tab-body-content {
+  .mat-mdc-tab-body-content {
     padding: 20px 0;
   }
 }
@@ -68,39 +69,155 @@
   text-align: right;
 }
 
-.jobs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+// Clean table styling similar to HR dashboard
+.jobs-table {
+  width: 100%;
   margin-top: 20px;
-}
-
-.job-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
   
-  mat-card-content {
-    flex: 1;
+  .mat-mdc-header-cell {
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #e0e0e0;
   }
   
-  .job-details {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #666;
+  .mat-mdc-cell {
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .mat-mdc-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
     
-    span {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-      }
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+.job-info,
+.employee-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  
+  strong {
+    font-size: 0.9rem;
+  }
+  
+  small {
+    font-size: 0.8rem;
+    color: #666;
+  }
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priority-flag {
+  display: flex;
+  align-items: center;
+  
+  .priority-icon {
+    color: #ff5722;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  
+  &.pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  &.active {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  &.open {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  &.in-review {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  
+  &.approved {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  &.rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  &.closed {
+    background-color: #e2e3e5;
+    color: #383d41;
+  }
+  
+  &.on-hold {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+}
+
+.candidates-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  
+  &.pending {
+    color: #ff9800;
+  }
+  
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+  
+  .stats-grid {
+    .mat-grid-tile {
+      height: 120px !important;
+    }
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .jobs-table {
+    .mat-mdc-header-cell,
+    .mat-mdc-cell {
+      padding: 8px;
+      font-size: 0.8rem;
     }
   }
 }

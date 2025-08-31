@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: float = 0.5  # 30 seconds for testing
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
     # CORS
@@ -23,3 +23,4 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 settings = Settings()
+print(f"🔧 Settings loaded: ACCESS_TOKEN_EXPIRE_MINUTES = {settings.ACCESS_TOKEN_EXPIRE_MINUTES}")

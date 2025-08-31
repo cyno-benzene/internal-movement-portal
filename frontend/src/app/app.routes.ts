@@ -59,17 +59,41 @@ export const routes: Routes = [
     ]
   },
   
-  // Jobs routes - Manager/HR only
+  // Jobs routes - Role-based access
   {
     path: 'jobs',
-    canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['manager', 'hr', 'admin'] },
+    canActivate: [AuthGuard],
     children: [
-      { path: '', component: JobListComponent },
-      { path: 'create', component: JobCreateComponent },
-      { path: ':id', component: JobDetailsComponent }, // View job details
-      { path: 'edit/:id', component: JobCreateComponent },
-      { path: ':id/matches', component: JobMatchesComponent }, // View candidate matches (HR only)
+      { 
+        path: '', 
+        component: JobListComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['manager', 'hr', 'admin'] }
+      },
+      { 
+        path: 'create', 
+        component: JobCreateComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['manager', 'admin'] } // HR excluded from job creation
+      },
+      { 
+        path: ':id', 
+        component: JobDetailsComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['manager', 'hr', 'admin'] }
+      },
+      { 
+        path: 'edit/:id', 
+        component: JobCreateComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['manager', 'admin'] } // HR excluded from job editing
+      },
+      { 
+        path: ':id/matches', 
+        component: JobMatchesComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['manager', 'hr', 'admin'] }
+      },
       { path: ':id/discover', component: JobListComponent }, // Legacy - redirect to matches
       { path: ':id/shortlist', component: JobListComponent }, // Legacy - redirect to matches
     ]

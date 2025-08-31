@@ -44,7 +44,7 @@ async def get_my_invitations(
                 "id": str(invitation.job.id),
                 "title": invitation.job.title,
                 "team": invitation.job.team,
-                "short_description": invitation.job.short_description,
+                "note": invitation.job.note,
                 "manager_name": invitation.job.manager.name
             },
             employee={
@@ -242,7 +242,7 @@ async def get_sent_invitations(
                 "id": str(invitation.job.id),
                 "title": invitation.job.title,
                 "team": invitation.job.team,
-                "short_description": invitation.job.short_description,
+                "note": invitation.job.note,
                 "manager_name": invitation.job.manager.name if invitation.job.manager else "Unknown"
             },
             employee={

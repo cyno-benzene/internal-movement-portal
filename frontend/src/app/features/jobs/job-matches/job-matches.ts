@@ -15,6 +15,7 @@ import { ApiService } from '../../../core/services/api';
 import { AuthService } from '../../../core/services/auth';
 import { Job } from '../../../core/models/job.model';
 import { EmployeeCandidate } from '../../../core/models/job.model';
+import { EmployeeProfileDialogComponent } from '../../../shared/components/employee-profile-dialog/employee-profile-dialog';
 
 export interface JobMatch {
   employee_id: string;
@@ -22,6 +23,7 @@ export interface JobMatch {
   employee_email: string;
   score: number;
   skills_match: string[];
+  invitation_sent?: boolean;  // Track invitation status
   explanation?: {
     skill_matches: { skill: string; score: number }[];
     experience_score: number;
@@ -183,39 +185,89 @@ export class JobMatchesComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     const employeeIds = selectedCandidates.map(c => c.employee_id);
     
-    // TODO: Implement invitation dialog/flow
-    this.showSuccess(`Invitations will be sent to ${selectedCandidates.length} candidates`);
+    // Send invitations to each selected employee
+    let sentCount = 0;
+    let totalCount = employeeIds.length;
     
-    // For now, just clear selection
-    this.selection.clear();
+    employeeIds.forEach(employeeId => {
+      this.apiService.inviteCandidate(this.jobId!, employeeId, "You have been invited based on your profile match.").subscribe({
+        next: () => {
+          sentCount++;
+          // Mark this employee as invited in the UI
+          const match = this.matches.find(m => m.employee_id === employeeId);
+          if (match) {
+            (match as any).invitation_sent = true;
+          }
+          
+          if (sentCount === totalCount) {
+            this.isLoading = false;
+            this.showSuccess(`Invitations sent to ${sentCount} candidates`);
+            this.selection.clear();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error sending invitation:', error);
+          sentCount++;
+          if (sentCount === totalCount) {
+            this.isLoading = false;
+          }
+          this.showError(`Failed to send invitation to ${selectedCandidates.find(c => c.employee_id === employeeId)?.employee_name}`);
+        }
+      });
+    });
   }
 
   viewEmployeeProfile(employeeId: string): void {
-    // TODO: Navigate to employee profile or open dialog
-    this.showSuccess('Opening employee profile...');
+    const employee = this.matches.find(m => m.employee_id === employeeId);
+    if (employee) {
+      const dialogRef = this.dialog.open(EmployeeProfileDialogComponent, {
+        width: '800px',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        data: {
+          employeeId: employee.employee_id,
+          employeeName: employee.employee_name,
+          employeeEmail: employee.employee_email,
+          matchScore: employee.score,
+          skillsMatch: employee.skills_match,
+          explanation: employee.explanation
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          console.log('Dialog was closed with result:', result);
+        }
+      });
+    } else {
+      this.showError('Employee details not found');
+    }
   }
 
   inviteSelected(): void {
-    const selectedCandidates = this.selection.selected;
-    if (selectedCandidates.length === 0) {
-      this.showError('Please select at least one candidate to invite');
-      return;
-    }
-
-    const employeeIds = selectedCandidates.map(c => c.employee_id);
-    
-    // TODO: Implement invitation dialog/flow
-    this.showSuccess(`Invitations will be sent to ${selectedCandidates.length} candidates`);
-    
-    // For now, just clear selection
-    this.selection.clear();
+    this.sendInvitations();
   }
 
   inviteSingle(match: JobMatch): void {
-    // TODO: Implement single invitation flow
-    this.showSuccess(`Invitation will be sent to ${match.employee_name}`);
+    // Check if already invited
+    if ((match as any).invitation_sent) {
+      this.showError('Invitation already sent to this candidate');
+      return;
+    }
+    
+    this.apiService.inviteCandidate(this.jobId!, match.employee_id, "You have been invited based on your profile match.").subscribe({
+      next: () => {
+        (match as any).invitation_sent = true;
+        this.showSuccess(`Invitation sent to ${match.employee_name}`);
+      },
+      error: (error: any) => {
+        console.error('Error sending invitation:', error);
+        this.showError(`Failed to send invitation to ${match.employee_name}`);
+      }
+    });
   }
 
   viewProfile(employeeId: string): void {
@@ -234,7 +286,11 @@ export class JobMatchesComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard/hr']);
+    if (this.jobId) {
+      this.router.navigate(['/jobs', this.jobId]);
+    } else {
+      this.router.navigate(['/jobs']);
+    }
   }
 
   private showSuccess(message: string): void {

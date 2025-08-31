@@ -1,0 +1,375 @@
+.employee-profile-dialog {
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e0e0e0;
+
+    .title-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .profile-icon {
+        font-size: 24px;
+        color: #1976d2;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 500;
+      }
+
+      .match-score {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .score-label {
+          font-size: 14px;
+          color: #666;
+        }
+
+        .score-value {
+          font-size: 18px;
+          font-weight: 600;
+          padding: 4px 12px;
+          border-radius: 16px;
+
+          &.score-high {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+          }
+
+          &.score-medium {
+            background-color: #fff3e0;
+            color: #f57c00;
+          }
+
+          &.score-low {
+            background-color: #ffebee;
+            color: #d32f2f;
+          }
+        }
+      }
+    }
+  }
+
+  .dialog-content {
+    padding: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      gap: 16px;
+
+      p {
+        margin: 0;
+        color: #666;
+      }
+    }
+
+    .error-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      background-color: #ffebee;
+      color: #d32f2f;
+      border-radius: 4px;
+      margin: 16px;
+    }
+
+    .profile-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      mat-card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        mat-card-header {
+          margin-bottom: 16px;
+
+          mat-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+
+            mat-icon {
+              color: #1976d2;
+            }
+          }
+        }
+      }
+
+      // Match explanation section
+      .match-section {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1f5fe 100%);
+        border: 2px solid #9c27b0;
+
+        .explanation-content {
+          .reasons {
+            margin-bottom: 20px;
+
+            h4 {
+              color: #7b1fa2;
+              margin-bottom: 8px;
+            }
+
+            ul {
+              margin: 0;
+              padding-left: 20px;
+
+              li {
+                margin-bottom: 4px;
+                line-height: 1.4;
+              }
+            }
+          }
+
+          .skill-scores {
+            margin-bottom: 20px;
+
+            h4 {
+              color: #7b1fa2;
+              margin-bottom: 12px;
+            }
+
+            .skill-match-list {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+
+              .skill-match-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 12px;
+                background: rgba(255,255,255,0.8);
+                border-radius: 6px;
+
+                .skill-name {
+                  font-weight: 500;
+                }
+
+                .skill-score {
+                  font-weight: 600;
+                  color: #1976d2;
+                }
+              }
+            }
+          }
+
+          .experience-score {
+            h4 {
+              color: #7b1fa2;
+              margin-bottom: 12px;
+            }
+
+            .score-bar {
+              position: relative;
+              background: rgba(255,255,255,0.8);
+              border-radius: 20px;
+              height: 24px;
+              overflow: hidden;
+
+              .score-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #4caf50, #81c784);
+                transition: width 0.3s ease;
+              }
+
+              .score-text {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-weight: 600;
+                font-size: 12px;
+                color: #333;
+              }
+            }
+          }
+        }
+      }
+
+      // Info grid
+      .info-section {
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 16px;
+
+          .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .label {
+              font-size: 12px;
+              font-weight: 600;
+              color: #666;
+              text-transform: uppercase;
+            }
+
+            .value {
+              font-size: 14px;
+              font-weight: 500;
+              color: #333;
+            }
+          }
+        }
+      }
+
+      // Skills section
+      .skills-section {
+        .skills-container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+
+          .skill-group {
+            h4 {
+              margin: 0 0 12px 0;
+              font-size: 16px;
+              font-weight: 600;
+              color: #333;
+            }
+
+            mat-chip-set {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+
+              mat-chip-option {
+                &.match-skill {
+                  background-color: #e8f5e8;
+                  color: #2e7d32;
+                  border: 2px solid #4caf50;
+
+                  mat-icon {
+                    color: #4caf50;
+                    margin-right: 4px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Experience row
+      .experience-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        .experience-section {
+          .company-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .company-item {
+              padding: 8px 0;
+              border-bottom: 1px solid #f0f0f0;
+
+              &:last-child {
+                border-bottom: none;
+              }
+
+              strong {
+                display: block;
+                font-weight: 600;
+                color: #333;
+              }
+
+              span {
+                font-size: 14px;
+                color: #666;
+              }
+            }
+          }
+        }
+
+        .certifications-section {
+          mat-chip-set {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+
+            mat-chip-option {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+
+      // Career aspirations
+      .aspirations-section {
+        .aspirations-content {
+          line-height: 1.6;
+          color: #555;
+          font-style: italic;
+          padding: 16px;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          border-left: 4px solid #1976d2;
+        }
+      }
+
+      // Achievements
+      .achievements-section {
+        .achievements-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+
+          li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+            padding-left: 24px;
+
+            &:before {
+              content: '🏆';
+              position: absolute;
+              left: 0;
+              top: 8px;
+            }
+
+            &:last-child {
+              border-bottom: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Dialog actions
+::ng-deep .mat-mdc-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  justify-content: flex-end;
+}

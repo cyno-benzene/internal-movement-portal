@@ -10,6 +10,7 @@ from app.schemas.auth import UserResponse
 from app.schemas.employee import RoleUpdateRequest
 from app.api.v1.deps import require_admin, require_hr_or_admin
 from app.services.semantic_match_service import PureSemanticMatchService
+from app.services.admin_service import AdminService
 
 router = APIRouter()
 
@@ -18,8 +19,9 @@ async def get_all_users(
     db: AsyncSession = Depends(get_db),
     current_user: Employee = Depends(require_hr_or_admin())
 ):
-    result = await db.execute(select(Employee))
-    users = result.scalars().all()
+    """Get all users - now using AdminService"""
+    admin_service = AdminService(db)
+    users = await admin_service.get_all_users()
     
     return [
         UserResponse(
@@ -39,38 +41,52 @@ async def update_user_role(
     db: AsyncSession = Depends(get_db),
     current_user: Employee = Depends(require_admin())
 ):
-    # Validate role
-    valid_roles = ["employee", "manager", "hr", "admin"]
-    if role_data.role not in valid_roles:
+    """Update user role - now using AdminService"""
+    try:
+        admin_service = AdminService(db)
+        user = await admin_service.update_user_role(user_id, role_data.role)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        return UserResponse(
+            id=str(user.id),
+            employee_id=user.employee_id,
+            email=user.email,
+            name=user.name,
+            role=user.role
+        )
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid role. Must be one of: {valid_roles}"
+            detail=str(e)
         )
+    # result = await db.execute(
+    #     update(Employee)
+    #     .where(Employee.id == user_id)
+    #     .values(role=role_data.role)
+    #     .returning(Employee)
+    # )
     
-    # Update user role
-    result = await db.execute(
-        update(Employee)
-        .where(Employee.id == user_id)
-        .values(role=role_data.role)
-        .returning(Employee)
-    )
+    # updated_user = result.scalar_one_or_none()
+    # if not updated_user:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail="User not found"
+    #     )
     
-    updated_user = result.scalar_one_or_none()
-    if not updated_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+    # await db.commit()
     
-    await db.commit()
-    
-    return UserResponse(
-        id=str(updated_user.id),
-        employee_id=updated_user.employee_id,
-        email=updated_user.email,
-        name=updated_user.name,
-        role=updated_user.role
-    )
+    # return UserResponse(
+    #     id=str(updated_user.id),
+    #     employee_id=updated_user.employee_id,
+    #     email=updated_user.email,
+    #     name=updated_user.name,
+    #     role=updated_user.role
+    # )
 
 @router.put("/jobs/{job_id}/reassign")
 async def reassign_job(
@@ -146,18 +162,55 @@ async def retrain_matching_model(
     current_user: Employee = Depends(require_hr_or_admin())
 ):
     """Retrain the pure semantic matching model with current data (HR/Admin only)"""
-    match_service = PureSemanticMatchService(db)
-    result = await match_service.retrain_model()
+    admin_service = AdminService(db)
+    result = await admin_service.retrain_matching_model()
     
-    if result["status"] == "success":
+    if result["status"] == "completed":
         return {
             "message": "Pure semantic matching model retrained successfully",
             "details": result
         }
-    elif result["status"] == "insufficient_data":
+    elif result["status"] == "skipped":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Insufficient data for retraining. Need more jobs and employees. Current: {result}"
+            detail=result["message"]
         )
     else:
         raise HTTPException(status_code=500, detail="Model retraining failed")
+
+@router.get("/stats")
+async def get_system_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: Employee = Depends(require_hr_or_admin())
+):
+    """Get system-wide statistics"""
+    admin_service = AdminService(db)
+    stats = await admin_service.get_system_stats()
+    return stats
+
+@router.get("/activity")
+async def get_recent_activity(
+    limit: int = 50,
+    db: AsyncSession = Depends(get_db),
+    current_user: Employee = Depends(require_hr_or_admin())
+):
+    """Get recent system activity"""
+    admin_service = AdminService(db)
+    activities = await admin_service.get_recent_activity(limit)
+    return {"activities": activities}
+
+@router.post("/notifications/system")
+async def create_system_notification(
+    content: str,
+    target_roles: List[str] = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: Employee = Depends(require_admin())
+):
+    """Create system-wide notifications for specific roles"""
+    admin_service = AdminService(db)
+    count = await admin_service.create_system_notification(content, target_roles)
+    return {
+        "message": f"System notification sent to {count} users",
+        "recipients": count,
+        "target_roles": target_roles or "all users"
+    }

@@ -13,7 +13,8 @@ import numpy as np
 import re
 from typing import List, Dict, Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
+from sqlalchemy.orm import selectinload
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.decomposition import TruncatedSVD
@@ -61,6 +62,7 @@ class PureSemanticMatchService:
     async def calculate_semantic_matches(self, job_id: str) -> List[Dict[str, Any]]:
         """
         Calculate pure semantic matches using advanced TF-IDF and LSA.
+        Returns cached matches if they exist, otherwise calculates new ones.
         """
         # Get job details
         job_result = await self.db.execute(
@@ -71,6 +73,34 @@ class PureSemanticMatchService:
         if not job:
             logger.error(f"Job {job_id} not found")
             return []
+        
+        # Check if matches already exist (caching mechanism)
+        if job.matching_status == "matched":
+            logger.info(f"Using cached matches for job {job_id}")
+            existing_matches = await self.db.execute(
+                select(JobMatch).options(selectinload(JobMatch.employee))
+                .where(JobMatch.job_id == job_id)
+                .order_by(JobMatch.score.desc())
+            )
+            
+            matches = []
+            for match in existing_matches.scalars().all():
+                matches.append({
+                    "employee": match.employee,
+                    "score": match.score,
+                    "explanation": match.explanation or {},
+                    "skills_match": match.skills_match or [],
+                    "shortlisted": match.shortlisted,
+                    "invitation_sent": match.invitation_sent
+                })
+            return matches
+        
+        # Update job status to "matching"
+        await self.db.execute(
+            update(Job).where(Job.id == job_id)
+            .values(matching_status="matching")
+        )
+        await self.db.commit()
         
         # Get eligible employees (only basic visibility filter)
         employees_result = await self.db.execute(
@@ -140,6 +170,13 @@ class PureSemanticMatchService:
         # Store matches in database
         await self._store_semantic_matches(job_id, matches)
         
+        # Update job status to "matched" to enable caching
+        await self.db.execute(
+            update(Job).where(Job.id == job_id)
+            .values(matching_status="matched")
+        )
+        await self.db.commit()
+        
         return matches
     
     def _extract_semantic_content(self, entity) -> str:
@@ -180,8 +217,9 @@ class PureSemanticMatchService:
         if job.description:
             content_parts.append(self._preprocess_text(job.description))
         
-        if job.short_description:
-            content_parts.append(self._preprocess_text(job.short_description))
+        # Include note field if available
+        if job.note:
+            content_parts.append(self._preprocess_text(job.note))
         
         # Skills without categorization
         if job.required_skills:

@@ -1,64 +1,6 @@
 <mat-toolbar color="primary" class="navbar">
   <span class="logo" routerLink="/dashboard">Internal Mobility Platform</span>
   
-  <!-- Navigation Menu -->
-  <div class="nav-menu" *ngIf="currentUser">
-    <button mat-button routerLink="/dashboard" routerLinkActive="active">
-      <mat-icon>dashboard</mat-icon>
-      Dashboard
-    </button>
-    
-    <!-- Manager/HR specific navigation - Jobs and candidate discovery -->
-    <button mat-button 
-            routerLink="/jobs" 
-            routerLinkActive="active"
-            *ngIf="isManager() || isHR()">
-      <mat-icon>work</mat-icon>
-      Jobs
-    </button>
-    
-    <!-- Employee specific navigation - Invitations only -->
-    <button mat-button 
-            routerLink="/invitations" 
-            routerLinkActive="active"
-            *ngIf="currentUser?.role === 'employee'">
-      <mat-icon>mail</mat-icon>
-      My Invitations
-    </button>
-    
-    <!-- Common profile link -->
-    <button mat-button routerLink="/profile" routerLinkActive="active">
-      <mat-icon>person</mat-icon>
-      Profile
-    </button>
-    
-    <!-- Manager/HR specific navigation -->
-    <button mat-button 
-            routerLink="/dashboard/manager" 
-            routerLinkActive="active"
-            *ngIf="isManager()">
-      <mat-icon>supervisor_account</mat-icon>
-      Manager
-    </button>
-    
-    <button mat-button 
-            routerLink="/dashboard/hr" 
-            routerLinkActive="active"
-            *ngIf="isHR()">
-      <mat-icon>groups</mat-icon>
-      HR
-    </button>
-    
-    <!-- Admin navigation -->
-    <button mat-button 
-            routerLink="/admin" 
-            routerLinkActive="active"
-            *ngIf="isAdmin()">
-      <mat-icon>admin_panel_settings</mat-icon>
-      Admin
-    </button>
-  </div>
-  
   <span class="spacer"></span>
   
   <div class="user-section" *ngIf="currentUser">

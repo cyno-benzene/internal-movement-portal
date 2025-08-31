@@ -1,6 +1,4 @@
 <div class="dashboard-container">
-  <h1>Manager Dashboard</h1>
-  
   <!-- Stats Cards -->
   <mat-grid-list cols="4" rowHeight="150px" gutterSize="20px" class="stats-grid">
     <mat-grid-tile>
@@ -56,30 +54,56 @@
           No jobs found. Create your first job posting!
         </div>
 
-        <div class="jobs-grid" *ngIf="myJobs.length > 0">
-          <mat-card *ngFor="let job of myJobs" class="job-card">
-            <mat-card-header>
-              <mat-card-title>{{ job.title }}</mat-card-title>
-              <mat-card-subtitle>{{ job.team }}</mat-card-subtitle>
-            </mat-card-header>
-            
-            <mat-card-content>
-              <p>{{ job.description | slice:0:150 }}...</p>
-              <div class="job-details">
-                <span><mat-icon>group</mat-icon> {{ job.team }}</span>
-                <span><mat-icon>schedule</mat-icon> {{ job.status }}</span>
+        <mat-table [dataSource]="myJobs" class="jobs-table" *ngIf="myJobs.length > 0">
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef>Position</mat-header-cell>
+            <mat-cell *matCellDef="let job">
+              <div class="job-info">
+                <strong>{{ job.title }}</strong>
+                <small>{{ job.team }}</small>
               </div>
-            </mat-card-content>
-            
-            <mat-card-actions>
-              <button mat-button routerLink="/jobs/{{ job.id }}">View Details</button>
-              <button mat-button routerLink="/jobs/{{ job.id }}/edit" *ngIf="job.status === 'active'">
-                <mat-icon>edit</mat-icon>
-                Edit Job
-              </button>
-            </mat-card-actions>
-          </mat-card>
-        </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+            <mat-cell *matCellDef="let job">
+              <div class="status-container">
+                <span class="status-badge" [ngClass]="getStatusClass(job.status)">
+                  {{ job.status }}
+                </span>
+                <span *ngIf="job.priority === 'high_importance'" class="priority-flag" matTooltip="High Importance">
+                  <mat-icon class="priority-icon">priority_high</mat-icon>
+                </span>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="created_date">
+            <mat-header-cell *matHeaderCellDef>Posted</mat-header-cell>
+            <mat-cell *matCellDef="let job">
+              {{ job.created_at | date:'shortDate' }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="candidates">
+            <mat-header-cell *matHeaderCellDef>Candidates</mat-header-cell>
+            <mat-cell *matCellDef="let job">
+              <span *ngIf="job.matching_status === 'matched'" class="candidates-info">
+                <mat-icon>group</mat-icon> Available
+              </span>
+              <span *ngIf="job.matching_status !== 'matched'" class="candidates-info pending">
+                <mat-icon>hourglass_empty</mat-icon> Pending
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="jobColumns"></mat-header-row>
+          <mat-row *matRowDef="let job; columns: jobColumns;" 
+                   class="clickable-row"
+                   (click)="navigateToJob(job.id)"
+                   matRipple></mat-row>
+        </mat-table>
       </div>
     </mat-tab>
   </mat-tab-group>

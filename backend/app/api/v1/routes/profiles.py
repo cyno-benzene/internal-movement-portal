@@ -64,9 +64,33 @@ async def update_my_profile(
         current_user.career_aspirations = profile_data.career_aspirations
     if profile_data.location is not None:
         current_user.location = profile_data.location
+    if profile_data.visibility_opt_out is not None:
+        current_user.visibility_opt_out = profile_data.visibility_opt_out
     
     await db.commit()
     await db.refresh(current_user)
+    
+    return EmployeeProfileResponse(
+        id=str(current_user.id),
+        employee_id=current_user.employee_id,
+        email=current_user.email,
+        name=current_user.name,
+        role=current_user.role,
+        technical_skills=current_user.technical_skills or [],
+        achievements=current_user.achievements or [],
+        years_experience=current_user.years_experience or 0,
+        past_companies=current_user.past_companies or [],
+        certifications=current_user.certifications or [],
+        education=current_user.education or [],
+        publications=current_user.publications or [],
+        career_aspirations=current_user.career_aspirations,
+        location=current_user.location,
+        current_job_title=getattr(current_user, 'current_job_title', None),
+        preferred_roles=getattr(current_user, 'preferred_roles', None) or [],
+        visibility_opt_out=getattr(current_user, 'visibility_opt_out', False),
+        parsed_resume=getattr(current_user, 'parsed_resume', None),
+        updated_at=current_user.updated_at
+    )
     
     return EmployeeProfileResponse(
         id=str(current_user.id),

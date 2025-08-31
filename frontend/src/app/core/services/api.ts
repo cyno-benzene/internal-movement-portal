@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Job, JobCreate, JobMatch, Invitation, EmployeeCandidate } from '../models/job.model';
+import { JobComment, JobCommentCreate } from '../models/job-comment.model';
 import { Application, ApplicationDetail } from '../models/application.model';
 import { EmployeeProfile, User } from '../models/user.model';
 
@@ -35,6 +36,15 @@ export class ApiService {
 
   getJobMatches(jobId: string): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/jobs/${jobId}/matches`);
+  }
+
+  // Job Comments
+  getJobComments(jobId: string): Observable<JobComment[]> {
+    return this.http.get<JobComment[]>(`${environment.apiUrl}/jobs/${jobId}/comments`);
+  }
+
+  createJobComment(jobId: string, content: string): Observable<JobComment> {
+    return this.http.post<JobComment>(`${environment.apiUrl}/jobs/${jobId}/comments`, { content });
   }
 
   triggerMatching(jobId: string): Observable<void> {
@@ -99,7 +109,22 @@ export class ApiService {
   }
 
   updateMyProfile(profile: Partial<EmployeeProfile>): Observable<EmployeeProfile> {
-    return this.http.put<EmployeeProfile>(`${environment.apiUrl}/profiles/me`, profile);
+    // Only send fields that are allowed in EmployeeProfileUpdate
+    const updateData: any = {};
+    
+    if (profile.name !== undefined) updateData.name = profile.name;
+    if (profile.technical_skills !== undefined) updateData.technical_skills = profile.technical_skills;
+    if (profile.achievements !== undefined) updateData.achievements = profile.achievements;
+    if (profile.years_experience !== undefined) updateData.years_experience = profile.years_experience;
+    if (profile.past_companies !== undefined) updateData.past_companies = profile.past_companies;
+    if (profile.certifications !== undefined) updateData.certifications = profile.certifications;
+    if (profile.education !== undefined) updateData.education = profile.education;
+    if (profile.publications !== undefined) updateData.publications = profile.publications;
+    if (profile.career_aspirations !== undefined) updateData.career_aspirations = profile.career_aspirations;
+    if (profile.location !== undefined) updateData.location = profile.location;
+    if (profile.visibility_opt_out !== undefined) updateData.visibility_opt_out = profile.visibility_opt_out;
+    
+    return this.http.put<EmployeeProfile>(`${environment.apiUrl}/profiles/me`, updateData);
   }
 
   updateVisibilityPreference(visibilityOptOut: boolean): Observable<void> {

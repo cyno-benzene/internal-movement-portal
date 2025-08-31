@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../../core/services/api';
 import { AuthService } from '../../../core/services/auth';
+import { JobCommentsComponent } from '../job-comments/job-comments';
 import { Job } from '../../../core/models/job.model';
 
 @Component({
@@ -19,7 +20,8 @@ import { Job } from '../../../core/models/job.model';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    JobCommentsComponent
   ],
   templateUrl: './job-details.html',
   styleUrl: './job-details.scss'
@@ -65,6 +67,11 @@ export class JobDetailsComponent implements OnInit {
            this.currentUser?.id === this.job?.manager_id;
   }
 
+  canEditJob(): boolean {
+    return this.currentUser?.role === 'admin' || 
+           this.currentUser?.id === this.job?.manager_id;
+  }
+
   editJob(): void {
     if (this.job) {
       this.router.navigate(['/jobs/edit', this.job.id]);
@@ -77,7 +84,34 @@ export class JobDetailsComponent implements OnInit {
     }
   }
 
+  triggerMatching(): void {
+    if (!this.job) return;
+    
+    // Inform user what this does
+    if (confirm(`Trigger AI matching for "${this.job.title}"?\n\nThis will analyze employee profiles and find the best candidates for this position based on their skills and experience.`)) {
+      this.apiService.triggerMatching(this.job.id).subscribe({
+        next: () => {
+          this.snackBar.open('Matching completed! Reviewing candidates...', 'Close', { duration: 3000 });
+          // Update the job's matching status locally
+          if (this.job) {
+            this.job.matching_status = 'matched';
+          }
+          // Navigate to job matches page where HR can review and invite candidates
+          this.router.navigate(['/jobs', this.job!.id, 'matches']);
+        },
+        error: (error) => {
+          console.error('Error triggering matching:', error);
+          this.snackBar.open('Failed to trigger matching', 'Close', { duration: 3000 });
+        }
+      });
+    }
+  }
+
   goBack(): void {
     this.router.navigate(['/jobs']);
+  }
+
+  canViewComments(): boolean {
+    return this.currentUser && ['manager', 'hr', 'admin'].includes(this.currentUser.role);
   }
 }

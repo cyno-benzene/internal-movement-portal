@@ -3,14 +3,14 @@ export interface Job {
   title: string;
   team: string;
   description: string;
-  short_description?: string;
   required_skills: string[];
   optional_skills?: string[];
   min_years_experience?: number;
   preferred_certifications?: string[];
+  priority?: string; // 'normal' | 'high_importance'
   status: string;
-  visibility: 'open' | 'invite_only';
-  internal_notes?: string;
+  matching_status?: string;  // Added for tracking matching state
+  note?: string;
   manager_id: string;
   manager_name?: string;
   created_at: string;
@@ -20,13 +20,12 @@ export interface JobCreate {
   title: string;
   team: string;
   description: string;
-  short_description?: string;
   required_skills: string[];
   optional_skills?: string[];
   min_years_experience?: number;
   preferred_certifications?: string[];
-  visibility?: 'open' | 'invite_only';
-  internal_notes?: string;
+  priority?: string; // 'normal' | 'high_importance'
+  note?: string;
 }
 
 export interface JobMatch {
@@ -34,7 +33,6 @@ export interface JobMatch {
     id: string;
     title: string;
     team: string;
-    short_description?: string;
     manager_name?: string;
   };
   score: number;
@@ -47,7 +45,6 @@ export interface Invitation {
     id: string;
     title: string;
     team: string;
-    short_description: string;
     manager_name: string;
     department?: string;
     location?: string;

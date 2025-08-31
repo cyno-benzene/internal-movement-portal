@@ -15,24 +15,24 @@
         <div class="form-row">
           <mat-form-field appearance="outline">
             <mat-label>Full Name</mat-label>
-            <input matInput formControlName="name" required>
+            <input matInput formControlName="name" [disabled]="true">
           </mat-form-field>
           
           <mat-form-field appearance="outline">
             <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" required>
+            <input matInput type="email" formControlName="email" [disabled]="true">
           </mat-form-field>
         </div>
         
         <div class="form-row">
           <mat-form-field appearance="outline">
             <mat-label>Years of Experience</mat-label>
-            <input matInput type="number" formControlName="years_experience" min="0">
+            <input matInput type="number" formControlName="years_experience" min="0" [disabled]="true">
           </mat-form-field>
           
           <mat-form-field appearance="outline">
             <mat-label>Location</mat-label>
-            <input matInput formControlName="location">
+            <input matInput formControlName="location" [disabled]="true">
           </mat-form-field>
         </div>
       </mat-card-content>

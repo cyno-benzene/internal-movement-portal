@@ -7,6 +7,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatRippleModule } from '@angular/material/core';
 import { ApiService } from '../../../core/services/api';
 import { AuthService } from '../../../core/services/auth';
 import { Job } from '../../../core/models/job.model';
@@ -22,14 +23,15 @@ import { Job } from '../../../core/models/job.model';
     MatTableModule,
     MatIconModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    MatRippleModule
   ],
   templateUrl: './job-list.html',
   styleUrl: './job-list.scss'
 })
 export class JobListComponent implements OnInit {
   jobs: Job[] = [];
-  displayedColumns = ['title', 'team', 'status', 'actions'];
+  displayedColumns = ['title', 'team', 'status'];
   showCreateJobButton = false;
 
   constructor(
@@ -43,7 +45,8 @@ export class JobListComponent implements OnInit {
   ngOnInit(): void {
     this.loadJobs();
     const user = this.authService.getCurrentUser();
-    this.showCreateJobButton = user?.role === 'admin' || user?.role === 'hr' || user?.role === 'manager';
+    // Only admin and manager users can create jobs, not HR
+    this.showCreateJobButton = user?.role === 'admin' || user?.role === 'manager';
   }
 
   loadJobs(): void {
@@ -70,46 +73,5 @@ export class JobListComponent implements OnInit {
   viewJob(job: Job): void {
     // Navigate to job details page
     this.router.navigate(['/jobs', job.id]);
-  }
-
-  deleteJob(job: Job): void {
-    if (confirm(`Are you sure you want to delete "${job.title}"?`)) {
-      this.apiService.deleteJob(job.id).subscribe({
-        next: () => {
-          this.jobs = this.jobs.filter(j => j.id !== job.id);
-          this.snackBar.open('Job deleted successfully', 'Close', { duration: 3000 });
-        },
-        error: (error) => {
-          this.snackBar.open('Failed to delete job', 'Close', { duration: 3000 });
-        }
-      });
-    }
-  }
-
-  triggerMatching(job: Job): void {
-    // Inform user what this does
-    if (confirm(`Trigger AI matching for "${job.title}"?\n\nThis will analyze employee profiles and find the best candidates for this position based on their skills and experience.`)) {
-      this.apiService.triggerMatching(job.id).subscribe({
-        next: () => {
-          this.snackBar.open('Matching completed! Reviewing candidates...', 'Close', { duration: 3000 });
-          // Navigate to job matches page where HR can review and invite candidates
-          this.router.navigate(['/jobs', job.id, 'matches']);
-        },
-        error: (error) => {
-          console.error('Error triggering matching:', error);
-          this.snackBar.open('Failed to trigger matching', 'Close', { duration: 3000 });
-        }
-      });
-    }
-  }
-
-  canManageJob(job: Job): boolean {
-    const user = this.authService.getCurrentUser();
-    return user?.role === 'admin' || user?.role === 'hr' || user?.id === job.manager_id;
-  }
-
-  canTriggerMatching(): boolean {
-    const user = this.authService.getCurrentUser();
-    return user?.role === 'admin' || user?.role === 'hr';
   }
 }

@@ -1,0 +1,57 @@
+<mat-card class="comments-section">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>comment</mat-icon>
+      Comments
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Comments List -->
+    <div class="comments-list" *ngIf="comments.length > 0">
+      <div class="comment" *ngFor="let comment of comments">
+        <div class="comment-header">
+          <div class="author-info">
+            <span class="author-name">{{ comment.author_name }}</span>
+            <span class="author-role" [ngClass]="comment.author_role">{{ getRoleDisplayName(comment.author_role) }}</span>
+          </div>
+          <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+        </div>
+        <div class="comment-content">{{ comment.content }}</div>
+      </div>
+    </div>
+
+    <!-- No Comments Message -->
+    <div class="no-comments" *ngIf="comments.length === 0 && !isLoading">
+      <mat-icon>chat_bubble_outline</mat-icon>
+      <span>No comments yet</span>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading" *ngIf="isLoading">
+      <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+      <span>Loading...</span>
+    </div>
+
+    <!-- Add Comment Form -->
+    <form [formGroup]="commentForm" (ngSubmit)="onSubmit()" class="comment-form" *ngIf="canComment()">
+      <mat-form-field appearance="outline" class="comment-input">
+        <textarea 
+          matInput 
+          formControlName="content" 
+          rows="2" 
+          placeholder="Add a comment...">
+        </textarea>
+        <button 
+          mat-icon-button 
+          matSuffix
+          type="submit" 
+          [disabled]="commentForm.invalid || isSubmitting"
+          class="send-button">
+          <mat-icon *ngIf="!isSubmitting">send</mat-icon>
+          <mat-progress-spinner *ngIf="isSubmitting" diameter="16" mode="indeterminate"></mat-progress-spinner>
+        </button>
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+</mat-card>

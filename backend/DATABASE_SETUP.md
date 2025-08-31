@@ -10,11 +10,11 @@ This directory contains scripts to set up the Internal Mobility Platform databas
 2. **Create empty database:**
    ```sql
    CREATE DATABASE imp_db;
-   CREATE USER mobility_user WITH PASSWORD 'your_password';
+   CREATE USER imp_user WITH PASSWORD 'password';
    GRANT USAGE ON SCHEMA public TO imp_user;
    GRANT CREATE ON SCHEMA public TO imp_user;
    ALTER DATABASE imp_db OWNER TO imp_user;
-   GRANT ALL PRIVILEGES ON DATABASE imp_db TO mobility_user;
+   GRANT ALL PRIVILEGES ON DATABASE imp_db TO imp_user;
    ```
 
 3. **Configure environment:**

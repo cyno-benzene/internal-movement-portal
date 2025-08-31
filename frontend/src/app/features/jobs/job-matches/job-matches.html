@@ -23,7 +23,7 @@
       <h3>No Matches Found</h3>
       <p>No suitable candidates were found for this position. Consider reviewing the job requirements or expanding the search criteria.</p>
       <button mat-raised-button color="primary" (click)="goBack()">
-        Back to Dashboard
+        Back to Job Details
       </button>
     </div>
 
@@ -86,7 +86,7 @@
           <mat-cell *matCellDef="let match">
             <div class="score-display">
               <div class="score-circle" [ngClass]="getScoreClass(match.score)">
-                {{ (match.score * 100) | number:'1.0-0' }}%
+                {{ match.score | number:'1.0-1' }}%
               </div>
             </div>
           </mat-cell>
@@ -110,7 +110,7 @@
           <mat-cell *matCellDef="let match">
             <div class="explanation" *ngIf="match.explanation">
               <div class="explanation-summary">
-                <strong>Experience Score:</strong> {{ (match.explanation.experience_score * 100) | number:'1.0-0' }}%
+                <strong>Experience Score:</strong> {{ match.explanation.experience_score | number:'1.0-1' }}%
               </div>
               <div class="reasons" *ngIf="match.explanation.reasons?.length">
                 <ul>
@@ -125,11 +125,15 @@
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
           <mat-cell *matCellDef="let match">
-            <button mat-button color="primary" (click)="inviteSingle(match)">
-              <mat-icon>send</mat-icon>
-              Invite
+            <button 
+              mat-button 
+              color="primary" 
+              (click)="inviteSingle(match)"
+              [disabled]="match.invitation_sent">
+              <mat-icon>{{ match.invitation_sent ? 'check' : 'send' }}</mat-icon>
+              {{ match.invitation_sent ? 'Invited' : 'Invite' }}
             </button>
-            <button mat-button (click)="viewProfile(match.employee_id)">
+            <button mat-button (click)="viewEmployeeProfile(match.employee_id)">
               <mat-icon>person</mat-icon>
               Profile
             </button>
@@ -145,7 +149,7 @@
     <div class="actions-bar" *ngIf="matches.length > 0">
       <button mat-raised-button (click)="goBack()">
         <mat-icon>arrow_back</mat-icon>
-        Back to Dashboard
+        Back to Job Details
       </button>
       <button mat-raised-button color="accent" (click)="refreshMatches()">
         <mat-icon>refresh</mat-icon>

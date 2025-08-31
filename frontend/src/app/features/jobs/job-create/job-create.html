@@ -28,19 +28,78 @@
           </mat-error>
         </mat-form-field>
 
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="note" rows="3" placeholder="Private notes for HR and managers only"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Minimum Years of Experience</mat-label>
+          <input matInput type="number" formControlName="min_years_experience" min="0" placeholder="0">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Priority</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option value="normal">Normal</mat-option>
+            <mat-option value="high_importance">High Importance</mat-option>
+          </mat-select>
+        </mat-form-field>
+
         <div class="skills-section">
+          <h3>Required Skills</h3>
           <mat-form-field appearance="outline" class="skill-input">
             <mat-label>Add Required Skills</mat-label>
-            <input matInput formControlName="skillInput" (keyup.enter)="addSkill()">
-            <button mat-icon-button matSuffix type="button" (click)="addSkill()">
+            <input matInput formControlName="skillInput" (keyup.enter)="addSkill('required')">
+            <button mat-icon-button matSuffix type="button" (click)="addSkill('required')">
               <mat-icon>add</mat-icon>
             </button>
           </mat-form-field>
 
-          <div class="skills-chips" *ngIf="skills.length > 0">
+          <div class="skills-chips" *ngIf="requiredSkills.length > 0">
             <mat-chip-listbox>
-              <mat-chip-option *ngFor="let skill of skills" (removed)="removeSkill(skill)">
+              <mat-chip-option *ngFor="let skill of requiredSkills" (removed)="removeSkill('required', skill)">
                 {{ skill }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip-option>
+            </mat-chip-listbox>
+          </div>
+        </div>
+
+        <div class="skills-section">
+          <h3>Optional Skills</h3>
+          <mat-form-field appearance="outline" class="skill-input">
+            <mat-label>Add Optional Skills</mat-label>
+            <input matInput formControlName="optionalSkillInput" (keyup.enter)="addSkill('optional')">
+            <button mat-icon-button matSuffix type="button" (click)="addSkill('optional')">
+              <mat-icon>add</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <div class="skills-chips" *ngIf="optionalSkills.length > 0">
+            <mat-chip-listbox>
+              <mat-chip-option *ngFor="let skill of optionalSkills" (removed)="removeSkill('optional', skill)">
+                {{ skill }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip-option>
+            </mat-chip-listbox>
+          </div>
+        </div>
+
+        <div class="skills-section">
+          <h3>Preferred Certifications</h3>
+          <mat-form-field appearance="outline" class="skill-input">
+            <mat-label>Add Preferred Certifications</mat-label>
+            <input matInput formControlName="certificationInput" (keyup.enter)="addSkill('certification')">
+            <button mat-icon-button matSuffix type="button" (click)="addSkill('certification')">
+              <mat-icon>add</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <div class="skills-chips" *ngIf="preferredCertifications.length > 0">
+            <mat-chip-listbox>
+              <mat-chip-option *ngFor="let cert of preferredCertifications" (removed)="removeSkill('certification', cert)">
+                {{ cert }}
                 <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip-option>
             </mat-chip-listbox>

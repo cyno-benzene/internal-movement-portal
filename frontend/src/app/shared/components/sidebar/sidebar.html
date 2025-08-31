@@ -1,7 +1,25 @@
 <mat-nav-list class="sidebar">
-  <a mat-list-item [routerLink]="getDashboardRoute()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+  <!-- Manager specific dashboard -->
+  <a mat-list-item *ngIf="currentUser?.role === 'manager'" routerLink="/dashboard/manager" routerLinkActive="active">
+    <mat-icon matListItemIcon>supervisor_account</mat-icon>
+    <span matListItemTitle>Dashboard</span>
+  </a>
+
+  <!-- HR specific dashboard -->
+  <a mat-list-item *ngIf="currentUser?.role === 'hr'" routerLink="/dashboard/hr" routerLinkActive="active">
+    <mat-icon matListItemIcon>groups</mat-icon>
+    <span matListItemTitle>Dashboard</span>
+  </a>
+
+  <!-- <a mat-list-item [routerLink]="getDashboardRoute()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
     <mat-icon matListItemIcon>dashboard</mat-icon>
     <span matListItemTitle>Dashboard</span>
+  </a> -->
+  
+  <!-- Admin specific navigation -->
+  <a mat-list-item *ngIf="currentUser?.role === 'admin'" routerLink="/admin" routerLinkActive="active">
+    <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+    <span matListItemTitle>Admin Panel</span>
   </a>
   
   <a mat-list-item *ngIf="currentUser?.role === 'admin'" routerLink="/admin/users" routerLinkActive="active">
@@ -9,6 +27,7 @@
     <span matListItemTitle>User Management</span>
   </a>
   
+  <!-- Manager/HR specific navigation -->
   <a mat-list-item *ngIf="hasRole(['manager', 'hr', 'admin'])" routerLink="/jobs" routerLinkActive="active">
     <mat-icon matListItemIcon>work</mat-icon>
     <span matListItemTitle>Jobs</span>
@@ -17,15 +36,16 @@
   <!-- Employee sees invitations they've received -->
   <a mat-list-item *ngIf="currentUser?.role === 'employee'" routerLink="/invitations" routerLinkActive="active">
     <mat-icon matListItemIcon>mail</mat-icon>
-    <span matListItemTitle>Invitations</span>
+    <span matListItemTitle>My Invitations</span>
   </a>
   
-  <!-- HR sees sent invitations -->
+  <!-- HR/Admin sees sent invitations -->
   <a mat-list-item *ngIf="hasRole(['hr', 'admin'])" routerLink="/invitations" routerLinkActive="active">
     <mat-icon matListItemIcon>send</mat-icon>
     <span matListItemTitle>Sent Invitations</span>
   </a>
   
+  <!-- Common profile link -->
   <a mat-list-item routerLink="/profile" routerLinkActive="active">
     <mat-icon matListItemIcon>person</mat-icon>
     <span matListItemTitle>Profile</span>

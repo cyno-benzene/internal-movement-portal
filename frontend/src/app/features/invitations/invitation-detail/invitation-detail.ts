@@ -65,7 +65,6 @@ export class InvitationDetailComponent implements OnInit {
           id: '1',
           title: 'Senior Frontend Developer',
           team: 'Frontend Team',
-          short_description: 'Join our dynamic frontend team and lead cutting-edge web development projects.',
           manager_name: 'Jane Smith',
           department: 'Engineering',
           description: 'We are looking for an experienced frontend developer to join our team and help build the next generation of our web applications.',

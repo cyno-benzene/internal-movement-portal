@@ -1,14 +1,13 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
-from sqlalchemy.orm import selectinload
 
 from app.db.session import get_db
 from app.models.notification import Notification
 from app.schemas.notification import NotificationResponse, NotificationMarkRead
 from app.api.v1.deps import get_current_user, require_authenticated
 from app.models.employee import Employee
+from app.services.notification_service import NotificationService
 
 router = APIRouter()
 
@@ -19,12 +18,8 @@ async def get_notifications(
 ):
     """Get all notifications for the current user"""
     try:
-        stmt = select(Notification).where(
-            Notification.user_id == current_user.id
-        ).order_by(Notification.created_at.desc())
-        
-        result = await db.execute(stmt)
-        notifications = result.scalars().all()
+        notification_service = NotificationService(db)
+        notifications = await notification_service.get_user_notifications(current_user.id)
         
         return [
             NotificationResponse(
@@ -38,77 +33,75 @@ async def get_notifications(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching notifications: {str(e)}")
 
+@router.get("/unread-count")
+async def get_unread_count(
+    db: AsyncSession = Depends(get_db),
+    current_user: Employee = Depends(require_authenticated())
+):
+    """Get count of unread notifications"""
+    try:
+        notification_service = NotificationService(db)
+        count = await notification_service.get_unread_count(current_user.id)
+        return {"unread_count": count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting unread count: {str(e)}")
+
 @router.post("/mark-read")
 async def mark_notifications_read(
     notification_data: NotificationMarkRead,
     db: AsyncSession = Depends(get_db),
-    current_user: Employee = Depends(get_current_user)
+    current_user: Employee = Depends(require_authenticated())
 ):
     """Mark notifications as read"""
     try:
-        # Verify all notifications belong to current user and update them
-        stmt = update(Notification).where(
-            Notification.id.in_(notification_data.notification_ids),
-            Notification.user_id == current_user.id
-        ).values(read=True)
+        notification_service = NotificationService(db)
+        success = await notification_service.mark_as_read(
+            notification_data.notification_ids, 
+            current_user.id
+        )
         
-        result = await db.execute(stmt)
-        await db.commit()
-        
-        if result.rowcount == 0:
+        if not success:
             raise HTTPException(status_code=404, detail="No notifications found or unauthorized")
         
-        return {"message": f"Marked {result.rowcount} notifications as read"}
+        return {"message": f"Marked {len(notification_data.notification_ids)} notifications as read"}
     except HTTPException:
         raise
     except Exception as e:
-        await db.rollback()
         raise HTTPException(status_code=500, detail=f"Error marking notifications as read: {str(e)}")
 
-@router.get("/unread-count")
-async def get_unread_count(
+@router.post("/mark-all-read")
+async def mark_all_notifications_read(
     db: AsyncSession = Depends(get_db),
-    current_user: Employee = Depends(get_current_user)
+    current_user: Employee = Depends(require_authenticated())
 ):
-    """Get count of unread notifications for the current user"""
+    """Mark all notifications as read for the current user"""
     try:
-        stmt = select(Notification).where(
-            Notification.user_id == current_user.id,
-            Notification.read == False
-        )
+        notification_service = NotificationService(db)
+        success = await notification_service.mark_all_as_read(current_user.id)
         
-        result = await db.execute(stmt)
-        notifications = result.scalars().all()
-        
-        return {"unread_count": len(notifications)}
+        return {"message": "All notifications marked as read"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting unread count: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error marking all notifications as read: {str(e)}")
 
-@router.post("/")
-async def create_notification(
-    content: str,
-    user_id: str,
+@router.delete("/{notification_id}")
+async def delete_notification(
+    notification_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: Employee = Depends(get_current_user)
+    current_user: Employee = Depends(require_authenticated())
 ):
-    """Create a new notification (internal use - typically called by system)"""
+    """Delete a specific notification"""
     try:
-        notification = Notification(
-            user_id=user_id,
-            content=content,
-            read=False
+        notification_service = NotificationService(db)
+        success = await notification_service.delete_notification(
+            notification_id, 
+            current_user.id
         )
         
-        db.add(notification)
-        await db.commit()
-        await db.refresh(notification)
+        if not success:
+            raise HTTPException(status_code=404, detail="Notification not found or unauthorized")
         
-        return NotificationResponse(
-            id=str(notification.id),
-            content=notification.content,
-            read=notification.read,
-            created_at=notification.created_at.isoformat()
-        )
+        return {"message": "Notification deleted successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
-        await db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error creating notification: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error deleting notification: {str(e)}")

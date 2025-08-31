@@ -15,35 +15,6 @@
   color: inherit;
 }
 
-.nav-menu {
-  display: flex;
-  gap: 8px;
-  margin-left: 20px;
-  
-  button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-    
-    &.active {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.08);
-    }
-  }
-}
-
 .spacer {
   flex: 1 1 auto;
 }
@@ -60,31 +31,7 @@
 }
 
 // Responsive design
-@media (max-width: 1024px) {
-  .nav-menu {
-    button {
-      span {
-        display: none; // Hide text on smaller screens
-      }
-      
-      mat-icon {
-        margin: 0;
-      }
-    }
-  }
-}
-
 @media (max-width: 768px) {
-  .nav-menu {
-    gap: 4px;
-    margin-left: 10px;
-    
-    button {
-      padding: 8px;
-      min-width: 40px;
-    }
-  }
-  
   .user-info {
     display: none; // Hide user info on mobile
   }

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
 
 class EmployeeProfileUpdate(BaseModel):
@@ -7,9 +7,9 @@ class EmployeeProfileUpdate(BaseModel):
     technical_skills: Optional[List[str]] = None
     achievements: Optional[List[str]] = None
     years_experience: Optional[int] = None
-    past_companies: Optional[List[Dict[str, Any]]] = None
+    past_companies: Optional[List[Union[str, Dict[str, Any]]]] = None
     certifications: Optional[List[str]] = None
-    education: Optional[List[Dict[str, Any]]] = None
+    education: Optional[List[Union[str, Dict[str, Any]]]] = None
     publications: Optional[List[str]] = None
     career_aspirations: Optional[str] = None
     location: Optional[str] = None

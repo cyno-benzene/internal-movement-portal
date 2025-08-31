@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../services/auth';
 
 @Injectable()
@@ -10,18 +11,27 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
     
-    console.log('AuthInterceptor - URL:', req.url);
-    console.log('AuthInterceptor - Token exists:', !!token);
-    
+    // Add auth header if token exists
+    let authReq = req;
     if (token) {
-      console.log('AuthInterceptor - Adding Authorization header');
-      const authReq = req.clone({
+      authReq = req.clone({
         headers: req.headers.set('Authorization', `Bearer ${token}`)
       });
-      return next.handle(authReq);
     }
     
-    console.log('AuthInterceptor - No token, proceeding without auth header');
-    return next.handle(req);
+    return next.handle(authReq).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Handle 401 Unauthorized errors
+        if (error.status === 401) {
+          // Check if the error is due to expired token
+          if (error.error?.detail?.includes('expired') || 
+              error.error?.detail?.includes('Could not validate credentials')) {
+            this.authService.forceLogoutDueToExpiration();
+          }
+        }
+        
+        return throwError(() => error);
+      })
+    );
   }
 }

@@ -8,6 +8,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../../core/services/api';
 import { AuthService } from '../../../core/services/auth';
@@ -26,6 +28,8 @@ import { Job, Invitation } from '../../../core/models/job.model';
     MatGridListModule,
     MatTableModule,
     MatTabsModule,
+    MatMenuModule,
+    MatTooltipModule,
     MatSnackBarModule
   ],
   templateUrl: './manager-dashboard.html',
@@ -50,6 +54,7 @@ export class ManagerDashboardComponent implements OnInit {
   };
   isLoading = true;
 
+  jobColumns = ['title', 'status', 'created_date', 'candidates'];
   invitationColumns = ['employee_name', 'job_title', 'sent_date', 'status', 'actions'];
 
   constructor(
@@ -216,6 +221,26 @@ export class ManagerDashboardComponent implements OnInit {
     } catch (error) {
       console.error('Error withdrawing invitation:', error);
       this.showError('Failed to withdraw invitation');
+    }
+  }
+
+  navigateToJob(jobId: string): void {
+    this.router.navigate(['/jobs', jobId]);
+  }
+
+  editJob(jobId: string): void {
+    this.router.navigate(['/jobs/edit', jobId]);
+  }
+
+  async triggerMatching(jobId: string): Promise<void> {
+    try {
+      await this.apiService.triggerMatching(jobId).toPromise();
+      this.showSuccess('Job matching triggered successfully');
+      // Reload the job data to get updated matching status
+      await this.loadMyJobs();
+    } catch (error) {
+      console.error('Error triggering job matching:', error);
+      this.showError('Failed to trigger job matching');
     }
   }
 

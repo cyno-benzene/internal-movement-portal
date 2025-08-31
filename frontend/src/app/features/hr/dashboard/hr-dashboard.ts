@@ -8,6 +8,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatRippleModule } from '@angular/material/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../../core/services/api';
 import { AuthService } from '../../../core/services/auth';
@@ -28,6 +29,7 @@ import { User } from '../../../core/models/user.model';
     MatTableModule,
     MatTabsModule,
     MatChipsModule,
+    MatRippleModule,
     MatSnackBarModule
   ],
   templateUrl: './hr-dashboard.html',
@@ -49,6 +51,7 @@ export class HrDashboardComponent implements OnInit {
   
   isLoading = true;
   invitationColumns = ['employee_name', 'job_title', 'manager', 'status', 'sent_date', 'actions'];
+  jobColumns = ['title', 'status', 'created_date', 'candidates'];
 
   constructor(
     private apiService: ApiService,
@@ -134,7 +137,7 @@ export class HrDashboardComponent implements OnInit {
       totalEmployees: this.allUsers.length,
       totalJobs: this.allJobs.length,
       totalInvitations: this.allInvitations.length,
-      activeJobs: this.allJobs.filter(job => job.status === 'active').length,
+      activeJobs: this.allJobs.filter(job => job.status === 'open').length,
       pendingInvitations: this.allInvitations.filter(inv => inv.status === 'pending').length,
       successfulPlacements: this.allInvitations.filter(inv => inv.status === 'accepted').length
     };
@@ -210,6 +213,40 @@ export class HrDashboardComponent implements OnInit {
       console.error('Error discovering candidates:', error);
       this.showError('Failed to discover candidates');
     }
+  }
+
+  triggerMatching(jobId: string): void {
+    const job = this.allJobs.find(j => j.id === jobId);
+    if (!job) return;
+
+    const confirmed = confirm(`Trigger AI matching for "${job.title}"?\n\nThis will analyze employee profiles and find the best candidates for this position.`);
+    if (!confirmed) return;
+
+    this.apiService.triggerMatching(jobId).subscribe({
+      next: () => {
+        this.showSuccess('Matching completed! Loading results...');
+        // Update the job's matching status
+        job.matching_status = 'matched';
+        // Navigate to matches view
+        this.router.navigate(['/jobs', jobId, 'matches']);
+      },
+      error: (error) => {
+        console.error('Error triggering matching:', error);
+        this.showError('Failed to trigger matching algorithm');
+      }
+    });
+  }
+
+  // New methods for simplified job management
+  getRecentJobs(): Job[] {
+    // Return only the 5 most recent jobs for dashboard view
+    return this.allJobs
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5);
+  }
+
+  navigateToJob(jobId: string): void {
+    this.router.navigate(['/jobs', jobId]);
   }
 
   private showSuccess(message: string): void {

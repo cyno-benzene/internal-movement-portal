@@ -7,7 +7,7 @@ from app.core.security import verify_password, get_password_hash, create_access_
 from app.core.config import settings
 from app.models.employee import Employee
 from app.schemas.auth import LoginRequest, TokenResponse, UserCreate, UserResponse
-from app.api.v1.deps import require_admin
+from app.api.v1.deps import require_admin, get_current_user
 
 router = APIRouter()
 
@@ -73,4 +73,30 @@ async def register(
         email=new_user.email,
         name=new_user.name,
         role=new_user.role
+    )
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_token(current_user: Employee = Depends(get_current_user)):
+    """Refresh the access token for the current user"""
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    access_token = create_access_token(
+        data={
+            "sub": str(current_user.id),
+            "employee_id": current_user.employee_id,
+            "role": current_user.role,
+            "email": current_user.email,
+            "name": current_user.name
+        },
+        expires_delta=access_token_expires
+    )
+    
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user_id=str(current_user.id),
+        employee_id=current_user.employee_id,
+        email=current_user.email,
+        role=current_user.role,
+        name=current_user.name
     )

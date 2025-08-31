@@ -1,0 +1,205 @@
+<div class="employee-profile-dialog">
+  <div mat-dialog-title class="dialog-header">
+    <div class="title-content">
+      <mat-icon class="profile-icon">person</mat-icon>
+      <h2>{{ data.employeeName }}</h2>
+      <div class="match-score" *ngIf="data.matchScore">
+        <span class="score-label">Match Score:</span>
+        <span class="score-value" [ngClass]="getScoreClass(data.matchScore)">{{ data.matchScore | number:'1.0-1' }}%</span>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading employee profile...</p>
+    </div>
+
+    <div *ngIf="error" class="error-container">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error }}</p>
+    </div>
+
+    <div *ngIf="!loading && !error && profile" class="profile-content">
+      <!-- Match Explanation Section -->
+      <mat-card class="match-section" *ngIf="data.explanation">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>psychology</mat-icon>
+            Why This Candidate Matches
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="explanation-content">
+            <div class="reasons" *ngIf="data.explanation.reasons?.length">
+              <h4>Key Matching Factors:</h4>
+              <ul>
+                <li *ngFor="let reason of data.explanation.reasons">{{ reason }}</li>
+              </ul>
+            </div>
+            
+            <div class="skill-scores" *ngIf="data.explanation.skill_matches?.length">
+              <h4>Skill Match Details:</h4>
+              <div class="skill-match-list">
+                <div *ngFor="let skillMatch of data.explanation.skill_matches" class="skill-match-item">
+                  <span class="skill-name">{{ skillMatch.skill }}</span>
+                  <span class="skill-score">{{ (skillMatch.score * 100) | number:'1.0-1' }}%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="experience-score" *ngIf="data.explanation.experience_score">
+              <h4>Experience Match:</h4>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="data.explanation.experience_score * 100"></div>
+                <span class="score-text">{{ (data.explanation.experience_score * 100) | number:'1.0-1' }}%</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Basic Info -->
+      <mat-card class="info-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>person</mat-icon>
+            Basic Information
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Email:</span>
+              <span class="value">{{ profile.email }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Current Role:</span>
+              <span class="value">{{ profile.current_job_title || 'Not specified' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Experience:</span>
+              <span class="value">{{ profile.years_experience || 0 }} years</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Location:</span>
+              <span class="value">{{ profile.location || 'Not specified' }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Skills & Technical Expertise -->
+      <mat-card class="skills-section" *ngIf="profile.technical_skills?.length || data.skillsMatch?.length">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>engineering</mat-icon>
+            Skills & Technical Expertise
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="skills-container">
+            <div class="skill-group" *ngIf="data.skillsMatch?.length">
+              <h4>🎯 Skills Matching This Position</h4>
+              <mat-chip-set>
+                <mat-chip-option *ngFor="let skill of data.skillsMatch" 
+                               [selected]="true" class="match-skill">
+                  <mat-icon>check_circle</mat-icon>
+                  {{ skill }}
+                </mat-chip-option>
+              </mat-chip-set>
+            </div>
+            
+            <div class="skill-group" *ngIf="getOtherSkills().length">
+              <h4>Other Technical Skills</h4>
+              <mat-chip-set>
+                <mat-chip-option *ngFor="let skill of getOtherSkills()">
+                  {{ skill }}
+                </mat-chip-option>
+              </mat-chip-set>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Experience & Certifications -->
+      <div class="experience-row">
+        <mat-card class="experience-section" *ngIf="profile.past_companies?.length">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>work_history</mat-icon>
+              Experience
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="company-list">
+              <div class="company-item" *ngFor="let company of profile.past_companies">
+                <strong>{{ typeof company === 'string' ? company : company.name || company.company }}</strong>
+                <span *ngIf="typeof company === 'object' && company.role">
+                  - {{ company.role }}
+                </span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="certifications-section" *ngIf="profile.certifications?.length">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>verified</mat-icon>
+              Certifications
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip-option *ngFor="let cert of profile.certifications">
+                {{ cert }}
+              </mat-chip-option>
+            </mat-chip-set>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Achievements -->
+      <mat-card class="achievements-section" *ngIf="profile.achievements?.length">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>emoji_events</mat-icon>
+            Achievements
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <ul class="achievements-list">
+            <li *ngFor="let achievement of profile.achievements">{{ achievement }}</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Career Aspirations -->
+      <mat-card class="aspirations-section" *ngIf="profile.career_aspirations">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>trending_up</mat-icon>
+            Career Aspirations
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="aspirations-content">
+            {{ profile.career_aspirations }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-raised-button color="primary" (click)="close()">
+      <mat-icon>close</mat-icon>
+      Close
+    </button>
+  </div>
+</div>
