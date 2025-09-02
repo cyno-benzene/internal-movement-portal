@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,7 +36,8 @@ export interface EmployeeProfileDialogData {
     MatProgressSpinnerModule
   ],
   templateUrl: './employee-profile-dialog.html',
-  styleUrls: ['./employee-profile-dialog.scss']
+  styleUrls: ['./employee-profile-dialog.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class EmployeeProfileDialogComponent {
   profile: EmployeeProfile | null = null;
@@ -68,12 +69,13 @@ export class EmployeeProfileDialogComponent {
         // Fallback profile with basic data
         this.profile = {
           id: this.data.employeeId,
+          employee_id: this.data.employeeId,
           email: this.data.employeeEmail,
           name: this.data.employeeName,
           role: '',
           technical_skills: this.data.skillsMatch || [],
           achievements: [],
-          years_experience: 0,
+          months_experience: 0,
           past_companies: [],
           certifications: [],
           education: [],
@@ -84,6 +86,11 @@ export class EmployeeProfileDialogComponent {
           preferred_roles: [],
           visibility_opt_out: false,
           parsed_resume: null,
+          date_of_joining: undefined,
+          reporting_officer_id: undefined,
+          rep_officer_name: undefined,
+          months: 0,
+          work_experiences: [],
           updated_at: new Date().toISOString()
         };
       }
@@ -103,6 +110,52 @@ export class EmployeeProfileDialogComponent {
     if (score >= 80) return 'score-high';
     if (score >= 60) return 'score-medium';
     return 'score-low';
+  }
+
+  formatTotalExperience(months: number): string {
+    if (months < 12) {
+      return `${months} month${months !== 1 ? 's' : ''}`;
+    }
+    
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    
+    if (remainingMonths === 0) {
+      return `${years} year${years !== 1 ? 's' : ''}`;
+    }
+    
+    return `${years} year${years !== 1 ? 's' : ''} ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
+  }
+
+  formatWorkExperienceDuration(experience: any): string {
+    if (!experience) return '';
+    
+    const startDate = experience.start_date ? new Date(experience.start_date) : null;
+    const endDate = experience.end_date ? new Date(experience.end_date) : new Date();
+    
+    if (!startDate) return '';
+    
+    const totalMonths = this.calculateMonthsDifference(startDate, endDate);
+    return this.formatTotalExperience(totalMonths);
+  }
+
+  getEmploymentTypeLabel(type: string): string {
+    const typeMap: { [key: string]: string } = {
+      'fulltime': 'Full-time',
+      'parttime': 'Part-time',
+      'contract': 'Contract',
+      'internship': 'Internship',
+      'freelance': 'Freelance',
+      'temporary': 'Temporary'
+    };
+    
+    return typeMap[type?.toLowerCase()] || type || 'Unknown';
+  }
+
+  private calculateMonthsDifference(startDate: Date, endDate: Date): number {
+    const yearDiff = endDate.getFullYear() - startDate.getFullYear();
+    const monthDiff = endDate.getMonth() - startDate.getMonth();
+    return yearDiff * 12 + monthDiff;
   }
 
   close(): void {

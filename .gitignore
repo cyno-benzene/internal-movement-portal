@@ -343,3 +343,4 @@ settings.local.py
 # Temporary files
 temp/
 tmp/
+backend/test_pure_semantic.py

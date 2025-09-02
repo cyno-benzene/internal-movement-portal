@@ -1,22 +1,26 @@
-<div class="employee-profile-dialog">
-  <div mat-dialog-title class="dialog-header">
-    <div class="title-content">
-      <mat-icon class="profile-icon">person</mat-icon>
-      <h2>{{ data.employeeName }}</h2>
-      <div class="match-score" *ngIf="data.matchScore">
-        <span class="score-label">Match Score:</span>
-        <span class="score-value" [ngClass]="getScoreClass(data.matchScore)">{{ data.matchScore | number:'1.0-1' }}%</span>
+<div class="employee-profile-sidebar">
+  <!-- Header -->
+  <div class="sidebar-header">
+    <div class="header-content">
+      <div class="employee-basic-info">
+        <h2 class="employee-name">{{ data.employeeName }}</h2>
+        <p class="employee-email">{{ data.employeeEmail }}</p>
+        <div class="match-score" *ngIf="data.matchScore">
+          <span class="score-label">Match Score</span>
+          <span class="score-value" [ngClass]="getScoreClass(data.matchScore)">{{ data.matchScore | number:'1.0-1' }}%</span>
+        </div>
       </div>
+      <button mat-icon-button (click)="close()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
-    <button mat-icon-button (click)="close()">
-      <mat-icon>close</mat-icon>
-    </button>
   </div>
 
-  <div mat-dialog-content class="dialog-content">
+  <!-- Content -->
+  <div class="sidebar-content">
     <div *ngIf="loading" class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading employee profile...</p>
+      <mat-spinner diameter="32"></mat-spinner>
+      <p>Loading profile...</p>
     </div>
 
     <div *ngIf="error" class="error-container">
@@ -24,182 +28,222 @@
       <p>{{ error }}</p>
     </div>
 
-    <div *ngIf="!loading && !error && profile" class="profile-content">
-      <!-- Match Explanation Section -->
-      <mat-card class="match-section" *ngIf="data.explanation">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>psychology</mat-icon>
-            Why This Candidate Matches
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="explanation-content">
-            <div class="reasons" *ngIf="data.explanation.reasons?.length">
-              <h4>Key Matching Factors:</h4>
-              <ul>
-                <li *ngFor="let reason of data.explanation.reasons">{{ reason }}</li>
-              </ul>
-            </div>
-            
-            <div class="skill-scores" *ngIf="data.explanation.skill_matches?.length">
-              <h4>Skill Match Details:</h4>
-              <div class="skill-match-list">
-                <div *ngFor="let skillMatch of data.explanation.skill_matches" class="skill-match-item">
-                  <span class="skill-name">{{ skillMatch.skill }}</span>
-                  <span class="skill-score">{{ (skillMatch.score * 100) | number:'1.0-1' }}%</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="experience-score" *ngIf="data.explanation.experience_score">
-              <h4>Experience Match:</h4>
-              <div class="score-bar">
-                <div class="score-fill" [style.width.%]="data.explanation.experience_score * 100"></div>
-                <span class="score-text">{{ (data.explanation.experience_score * 100) | number:'1.0-1' }}%</span>
+    <div *ngIf="!loading && !error && profile" class="profile-sections">
+      
+      <!-- Match Analysis Section (if available) -->
+      <div class="section match-analysis" *ngIf="data.explanation">
+        <div class="section-header">
+          <mat-icon>psychology</mat-icon>
+          <h3>Match Analysis</h3>
+        </div>
+        <div class="section-content">
+          <div class="match-reasons" *ngIf="data.explanation.reasons?.length">
+            <h4>Key Matching Factors</h4>
+            <ul class="reasons-list">
+              <li *ngFor="let reason of data.explanation.reasons">{{ reason }}</li>
+            </ul>
+          </div>
+          
+          <div class="skill-matches" *ngIf="data.explanation.skill_matches?.length">
+            <h4>Skill Match Details</h4>
+            <div class="skill-scores">
+              <div *ngFor="let skillMatch of data.explanation.skill_matches" class="skill-score-item">
+                <span class="skill-name">{{ skillMatch.skill }}</span>
+                <span class="skill-percentage">{{ (skillMatch.score * 100) | number:'1.0-1' }}%</span>
               </div>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
-      <!-- Basic Info -->
-      <mat-card class="info-section">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>person</mat-icon>
-            Basic Information
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+      <!-- Basic Information -->
+      <div class="section basic-info">
+        <div class="section-header">
+          <mat-icon>person</mat-icon>
+          <h3>Basic Information</h3>
+        </div>
+        <div class="section-content">
           <div class="info-grid">
             <div class="info-item">
-              <span class="label">Email:</span>
-              <span class="value">{{ profile.email }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Current Role:</span>
+              <span class="label">Current Role</span>
               <span class="value">{{ profile.current_job_title || 'Not specified' }}</span>
             </div>
             <div class="info-item">
-              <span class="label">Experience:</span>
-              <span class="value">{{ profile.years_experience || 0 }} years</span>
+              <span class="label">Total Experience</span>
+              <span class="value">{{ formatTotalExperience(profile.months_experience || 0) }}</span>
             </div>
-            <div class="info-item">
-              <span class="label">Location:</span>
-              <span class="value">{{ profile.location || 'Not specified' }}</span>
+            <div class="info-item" *ngIf="profile.date_of_joining">
+              <span class="label">Date of Joining</span>
+              <span class="value">{{ profile.date_of_joining | date }}</span>
+            </div>
+            <div class="info-item" *ngIf="profile.months">
+              <span class="label">Company Tenure</span>
+              <span class="value">{{ formatTotalExperience(profile.months || 0) }}</span>
+            </div>
+            <div class="info-item" *ngIf="profile.rep_officer_name">
+              <span class="label">Reporting Officer</span>
+              <span class="value">{{ profile.rep_officer_name }}</span>
+            </div>
+            <div class="info-item" *ngIf="profile.location">
+              <span class="label">Location</span>
+              <span class="value">{{ profile.location }}</span>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
-      <!-- Skills & Technical Expertise -->
-      <mat-card class="skills-section" *ngIf="profile.technical_skills?.length || data.skillsMatch?.length">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>engineering</mat-icon>
-            Skills & Technical Expertise
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+      <!-- Technical Skills -->
+      <div class="section skills" *ngIf="profile.technical_skills?.length">
+        <div class="section-header">
+          <mat-icon>code</mat-icon>
+          <h3>Technical Skills</h3>
+        </div>
+        <div class="section-content">
           <div class="skills-container">
-            <div class="skill-group" *ngIf="data.skillsMatch?.length">
+            <div class="matching-skills" *ngIf="data.skillsMatch?.length">
               <h4>🎯 Skills Matching This Position</h4>
-              <mat-chip-set>
-                <mat-chip-option *ngFor="let skill of data.skillsMatch" 
-                               [selected]="true" class="match-skill">
+              <div class="skills-chips matching">
+                <span *ngFor="let skill of data.skillsMatch" class="skill-chip match">
                   <mat-icon>check_circle</mat-icon>
                   {{ skill }}
-                </mat-chip-option>
-              </mat-chip-set>
-            </div>
-            
-            <div class="skill-group" *ngIf="getOtherSkills().length">
-              <h4>Other Technical Skills</h4>
-              <mat-chip-set>
-                <mat-chip-option *ngFor="let skill of getOtherSkills()">
-                  {{ skill }}
-                </mat-chip-option>
-              </mat-chip-set>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Experience & Certifications -->
-      <div class="experience-row">
-        <mat-card class="experience-section" *ngIf="profile.past_companies?.length">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>work_history</mat-icon>
-              Experience
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="company-list">
-              <div class="company-item" *ngFor="let company of profile.past_companies">
-                <strong>{{ typeof company === 'string' ? company : company.name || company.company }}</strong>
-                <span *ngIf="typeof company === 'object' && company.role">
-                  - {{ company.role }}
                 </span>
               </div>
             </div>
-          </mat-card-content>
-        </mat-card>
+            
+            <div class="other-skills" *ngIf="getOtherSkills().length">
+              <div class="skills-chips">
+                <span *ngFor="let skill of getOtherSkills()" class="skill-chip">
+                  {{ skill }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <mat-card class="certifications-section" *ngIf="profile.certifications?.length">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>verified</mat-icon>
-              Certifications
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <mat-chip-set>
-              <mat-chip-option *ngFor="let cert of profile.certifications">
-                {{ cert }}
-              </mat-chip-option>
-            </mat-chip-set>
-          </mat-card-content>
-        </mat-card>
+      <!-- Work Experience -->
+      <div class="section work-experience" *ngIf="profile.work_experiences?.length">
+        <div class="section-header">
+          <mat-icon>work</mat-icon>
+          <h3>Work Experience</h3>
+        </div>
+        <div class="section-content">
+          <div class="experience-list">
+            <div *ngFor="let exp of profile.work_experiences" class="experience-item">
+              <div class="experience-header">
+                <div class="title-and-type">
+                  <h4 class="job-title">{{ exp.job_title }}</h4>
+                  <span class="employment-type" [ngClass]="'type-' + (exp.employment_type || 'fulltime').toLowerCase().replace('-', '')">
+                    {{ getEmploymentTypeLabel(exp.employment_type || 'fulltime') }}
+                  </span>
+                </div>
+                <div class="company-name">{{ exp.company_name }}</div>
+                <div class="experience-meta">
+                  <span class="duration">{{ formatWorkExperienceDuration(exp) }}</span>
+                  <span *ngIf="exp.location" class="location"> • {{ exp.location }}</span>
+                </div>
+              </div>
+              <div *ngIf="exp.description" class="experience-description">
+                {{ exp.description }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legacy Experience (Past Companies) -->
+      <div class="section past-companies" *ngIf="profile.past_companies?.length && !profile.work_experiences?.length">
+        <div class="section-header">
+          <mat-icon>business</mat-icon>
+          <h3>Past Companies</h3>
+        </div>
+        <div class="section-content">
+          <div class="companies-list">
+            <div *ngFor="let company of profile.past_companies" class="company-item">
+              <strong>{{ typeof company === 'string' ? company : company.name || company.company }}</strong>
+              <span *ngIf="typeof company === 'object' && company.role" class="role">
+                {{ company.role }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certifications -->
+      <div class="section certifications" *ngIf="profile.certifications?.length">
+        <div class="section-header">
+          <mat-icon>verified</mat-icon>
+          <h3>Certifications</h3>
+        </div>
+        <div class="section-content">
+          <div class="certifications-list">
+            <span *ngFor="let cert of profile.certifications" class="certification-chip">
+              {{ cert }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Education -->
+      <div class="section education" *ngIf="profile.education?.length">
+        <div class="section-header">
+          <mat-icon>school</mat-icon>
+          <h3>Education</h3>
+        </div>
+        <div class="section-content">
+          <div class="education-list">
+            <div *ngFor="let edu of profile.education" class="education-item">
+              <div *ngIf="typeof edu === 'object'">
+                <strong>{{ edu.institution || edu.degree }}</strong>
+                <div *ngIf="edu.degree && edu.institution">{{ edu.degree }}</div>
+                <div *ngIf="edu.field_of_study" class="field">{{ edu.field_of_study }}</div>
+                <div *ngIf="edu.graduation_year" class="year">{{ edu.graduation_year }}</div>
+              </div>
+              <div *ngIf="typeof edu === 'string'">{{ edu }}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Achievements -->
-      <mat-card class="achievements-section" *ngIf="profile.achievements?.length">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>emoji_events</mat-icon>
-            Achievements
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+      <div class="section achievements" *ngIf="profile.achievements?.length">
+        <div class="section-header">
+          <mat-icon>emoji_events</mat-icon>
+          <h3>Achievements</h3>
+        </div>
+        <div class="section-content">
           <ul class="achievements-list">
             <li *ngFor="let achievement of profile.achievements">{{ achievement }}</li>
           </ul>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Career Aspirations -->
-      <mat-card class="aspirations-section" *ngIf="profile.career_aspirations">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>trending_up</mat-icon>
-            Career Aspirations
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="aspirations-content">
+      <div class="section aspirations" *ngIf="profile.career_aspirations">
+        <div class="section-header">
+          <mat-icon>trending_up</mat-icon>
+          <h3>Career Aspirations</h3>
+        </div>
+        <div class="section-content">
+          <div class="aspirations-text">
             {{ profile.career_aspirations }}
           </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
+        </div>
+      </div>
 
-  <div mat-dialog-actions>
-    <button mat-raised-button color="primary" (click)="close()">
-      <mat-icon>close</mat-icon>
-      Close
-    </button>
+      <!-- Publications -->
+      <div class="section publications" *ngIf="profile.publications?.length">
+        <div class="section-header">
+          <mat-icon>article</mat-icon>
+          <h3>Publications</h3>
+        </div>
+        <div class="section-content">
+          <ul class="publications-list">
+            <li *ngFor="let publication of profile.publications">{{ publication }}</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

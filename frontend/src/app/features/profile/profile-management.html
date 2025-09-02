@@ -1,265 +1,693 @@
 <div class="profile-container">
-  <h1>My Profile</h1>
-  
-  <div *ngIf="isLoading" class="loading">
-    Loading profile...
-  </div>
-
-  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
-    <!-- Basic Information -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Basic Information</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Full Name</mat-label>
-            <input matInput formControlName="name" [disabled]="true">
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" [disabled]="true">
-          </mat-form-field>
-        </div>
-        
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Years of Experience</mat-label>
-            <input matInput type="number" formControlName="years_experience" min="0" [disabled]="true">
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline">
-            <mat-label>Location</mat-label>
-            <input matInput formControlName="location" [disabled]="true">
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Technical Skills -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Technical Skills</mat-card-title>
-        <button mat-icon-button type="button" (click)="addSkill()">
-          <mat-icon>add</mat-icon>
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div formArrayName="technical_skills" class="array-fields">
-          <div *ngFor="let skill of technicalSkills.controls; let i = index" class="array-item">
-            <mat-form-field appearance="outline">
-              <mat-label>Skill {{ i + 1 }}</mat-label>
-              <input matInput [formControlName]="i">
-            </mat-form-field>
-            <button mat-icon-button type="button" (click)="removeSkill(i)" color="warn">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-        <button mat-button type="button" (click)="addSkill()" *ngIf="technicalSkills.length === 0">
-          <mat-icon>add</mat-icon>
-          Add Skill
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Achievements -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Achievements</mat-card-title>
-        <button mat-icon-button type="button" (click)="addAchievement()">
-          <mat-icon>add</mat-icon>
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div formArrayName="achievements" class="array-fields">
-          <div *ngFor="let achievement of achievements.controls; let i = index" class="array-item">
-            <mat-form-field appearance="outline">
-              <mat-label>Achievement {{ i + 1 }}</mat-label>
-              <textarea matInput [formControlName]="i" rows="2"></textarea>
-            </mat-form-field>
-            <button mat-icon-button type="button" (click)="removeAchievement(i)" color="warn">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-        <button mat-button type="button" (click)="addAchievement()" *ngIf="achievements.length === 0">
-          <mat-icon>add</mat-icon>
-          Add Achievement
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Education -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Education</mat-card-title>
-        <button mat-icon-button type="button" (click)="addEducation()">
-          <mat-icon>add</mat-icon>
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div formArrayName="education" class="array-fields">
-          <div *ngFor="let edu of education.controls; let i = index" [formGroupName]="i" class="education-item">
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>Institution</mat-label>
-                <input matInput formControlName="institution">
-              </mat-form-field>
-              
-              <mat-form-field appearance="outline">
-                <mat-label>Degree</mat-label>
-                <input matInput formControlName="degree">
-              </mat-form-field>
-            </div>
-            
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>Field of Study</mat-label>
-                <input matInput formControlName="field_of_study">
-              </mat-form-field>
-              
-              <mat-form-field appearance="outline">
-                <mat-label>Graduation Year</mat-label>
-                <input matInput formControlName="graduation_year">
-              </mat-form-field>
-              
-              <button mat-icon-button type="button" (click)="removeEducation(i)" color="warn">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
-        </div>
-        <button mat-button type="button" (click)="addEducation()" *ngIf="education.length === 0">
-          <mat-icon>add</mat-icon>
-          Add Education
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Past Companies -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Work Experience</mat-card-title>
-        <button mat-icon-button type="button" (click)="addCompany()">
-          <mat-icon>add</mat-icon>
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div formArrayName="past_companies" class="array-fields">
-          <div *ngFor="let company of pastCompanies.controls; let i = index" [formGroupName]="i" class="company-item">
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>Company Name</mat-label>
-                <input matInput formControlName="name">
-              </mat-form-field>
-              
-              <mat-form-field appearance="outline">
-                <mat-label>Position</mat-label>
-                <input matInput formControlName="position">
-              </mat-form-field>
-            </div>
-            
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>Duration</mat-label>
-                <input matInput formControlName="duration" placeholder="e.g., 2020-2023">
-              </mat-form-field>
-              
-              <button mat-icon-button type="button" (click)="removeCompany(i)" color="warn">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
-        </div>
-        <button mat-button type="button" (click)="addCompany()" *ngIf="pastCompanies.length === 0">
-          <mat-icon>add</mat-icon>
-          Add Work Experience
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Certifications -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Certifications</mat-card-title>
-        <button mat-icon-button type="button" (click)="addCertification()">
-          <mat-icon>add</mat-icon>
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div formArrayName="certifications" class="array-fields">
-          <div *ngFor="let cert of certifications.controls; let i = index" class="array-item">
-            <mat-form-field appearance="outline">
-              <mat-label>Certification {{ i + 1 }}</mat-label>
-              <input matInput [formControlName]="i">
-            </mat-form-field>
-            <button mat-icon-button type="button" (click)="removeCertification(i)" color="warn">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-        <button mat-button type="button" (click)="addCertification()" *ngIf="certifications.length === 0">
-          <mat-icon>add</mat-icon>
-          Add Certification
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Publications -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Publications</mat-card-title>
-        <button mat-icon-button type="button" (click)="addPublication()">
-          <mat-icon>add</mat-icon>
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div formArrayName="publications" class="array-fields">
-          <div *ngFor="let pub of publications.controls; let i = index" class="array-item">
-            <mat-form-field appearance="outline">
-              <mat-label>Publication {{ i + 1 }}</mat-label>
-              <textarea matInput [formControlName]="i" rows="2"></textarea>
-            </mat-form-field>
-            <button mat-icon-button type="button" (click)="removePublication(i)" color="warn">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-        <button mat-button type="button" (click)="addPublication()" *ngIf="publications.length === 0">
-          <mat-icon>add</mat-icon>
-          Add Publication
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Career Aspirations -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Career Aspirations</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>What are your career goals and aspirations?</mat-label>
-          <textarea matInput formControlName="career_aspirations" rows="4"></textarea>
-        </mat-form-field>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Actions -->
-    <div class="actions">
-      <button mat-raised-button 
-              color="primary" 
-              type="submit" 
-              [disabled]="profileForm.invalid || isSaving">
-        {{ isSaving ? 'Saving...' : 'Save Profile' }}
+  <div class="profile-header">
+    <h1>Your Profile</h1>
+    <div class="header-actions" *ngIf="!isLoading">
+      <button mat-raised-button color="primary" (click)="enableEditMode()" *ngIf="!isEditMode">
+        <mat-icon>edit</mat-icon>
+        Edit Profile
       </button>
-      
-      <button mat-button type="button" routerLink="/dashboard">
+      <button mat-raised-button color="primary" type="submit" form="profileForm" 
+              [disabled]="profileForm.invalid || isSaving" *ngIf="isEditMode">
+        <mat-icon>save</mat-icon>
+        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <button mat-button (click)="cancelEdit()" *ngIf="isEditMode">
+        <mat-icon>cancel</mat-icon>
         Cancel
       </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    <mat-spinner></mat-spinner>
+    <p>Loading profile...</p>
+  </div>
+
+  <div *ngIf="!isLoading && userProfile" class="profile-content">
+    <!-- View Mode -->
+    <div *ngIf="!isEditMode" class="view-mode">
+      <div class="profile-sections">
+        <!-- Basic Information -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Basic Information</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Name:</label>
+                <span>{{ userProfile.name }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email:</label>
+                <span>{{ userProfile.email }}</span>
+              </div>
+              <div class="info-item">
+                <label>Phone:</label>
+                <span>{{ profileForm.value.phone || 'Not provided' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Location:</label>
+                <span>{{ userProfile.location || 'Not provided' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Current Job Title:</label>
+                <span>{{ userProfile.current_job_title || 'Not provided' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Experience:</label>
+                <span>{{ formatTotalExperience(userProfile.months_experience || 0) }}</span>
+              </div>
+              <div class="info-item" *ngIf="userProfile.date_of_joining">
+                <label>Date of Joining:</label>
+                <span>{{ userProfile.date_of_joining | date }}</span>
+              </div>
+              <div class="info-item" *ngIf="userProfile.months">
+                <label>Company Tenure:</label>
+                <span>{{ formatTotalExperience(userProfile.months || 0) }}</span>
+              </div>
+              <div class="info-item" *ngIf="userProfile.rep_officer_name">
+                <label>Reporting Officer:</label>
+                <span>{{ userProfile.rep_officer_name }}</span>
+              </div>
+            </div>
+            <div class="bio-section" *ngIf="profileForm.value.bio">
+              <label>Bio:</label>
+              <p>{{ profileForm.value.bio }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Skills -->
+        <mat-card class="section-card" *ngIf="userProfile.technical_skills?.length">
+          <mat-card-header>
+            <mat-card-title>Technical Skills</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip *ngFor="let skill of userProfile.technical_skills">{{ skill }}</mat-chip>
+            </mat-chip-set>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Achievements -->
+        <mat-card class="section-card" *ngIf="userProfile.achievements?.length">
+          <mat-card-header>
+            <mat-card-title>Achievements</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ul class="achievement-list">
+              <li *ngFor="let achievement of userProfile.achievements">{{ achievement }}</li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Education -->
+        <mat-card class="section-card" *ngIf="userProfile.education?.length">
+          <mat-card-header>
+            <mat-card-title>Education</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="education-list">
+              <div *ngFor="let edu of userProfile.education" class="education-item">
+                <div *ngIf="edu.institution || edu.degree || edu.field_of_study">
+                  <strong>{{ edu.institution || edu }}</strong>
+                  <div *ngIf="edu.degree">{{ edu.degree }}</div>
+                  <div *ngIf="edu.field_of_study">{{ edu.field_of_study }}</div>
+                  <div *ngIf="edu.graduation_year" class="year">{{ edu.graduation_year }}</div>
+                </div>
+                <div *ngIf="typeof edu === 'string'">{{ edu }}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Work Experience -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Work Experience</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- New Work Experience Format -->
+            <div class="experience-list" *ngIf="userProfile.work_experiences?.length">
+              <div *ngFor="let exp of userProfile.work_experiences" class="work-experience-item">
+                <div class="experience-header">
+                  <div class="experience-title">{{ exp.job_title }}</div>
+                  <div class="employment-type-badge" [ngClass]="'type-' + (exp.employment_type || 'full-time').toLowerCase().replace('-', '')">
+                    {{ getEmploymentTypeLabel(exp.employment_type) }}
+                  </div>
+                </div>
+                <div class="company-name">{{ exp.company_name }}</div>
+                <div class="experience-meta">
+                  <span class="duration">
+                    {{ formatDuration(calculateExperienceDuration(exp)) }}
+                  </span>
+                  <span *ngIf="exp.location" class="location"> • {{ exp.location }}</span>
+                </div>
+                <div *ngIf="exp.description" class="experience-description">
+                  {{ exp.description }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Empty state for work experience -->
+            <div *ngIf="!userProfile.work_experiences?.length" class="empty-state">
+              <p class="empty-message">No work experience added yet.</p>
+              <p class="empty-hint">Switch to edit mode to add your professional experience.</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Certifications -->
+        <mat-card class="section-card" *ngIf="userProfile.certifications?.length">
+          <mat-card-header>
+            <mat-card-title>Certifications</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip *ngFor="let cert of userProfile.certifications">{{ cert }}</mat-chip>
+            </mat-chip-set>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Publications -->
+        <mat-card class="section-card" *ngIf="userProfile.publications?.length">
+          <mat-card-header>
+            <mat-card-title>Publications</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ul class="publication-list">
+              <li *ngFor="let pub of userProfile.publications">{{ pub }}</li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Preferred Roles -->
+        <mat-card class="section-card" *ngIf="userProfile.preferred_roles?.length">
+          <mat-card-header>
+            <mat-card-title>Preferred Roles</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip *ngFor="let role of userProfile.preferred_roles">{{ role }}</mat-chip>
+            </mat-chip-set>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Career Aspirations -->
+        <mat-card class="section-card" *ngIf="userProfile.career_aspirations">
+          <mat-card-header>
+            <mat-card-title>Career Aspirations</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ userProfile.career_aspirations }}</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Edit Mode -->
+    <form id="profileForm" [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="isEditMode" class="edit-mode">
+    <div class="form-sections">
+      <!-- Personal Information Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Personal Information</mat-card-title>
+              <mat-card-subtitle>Basic details and contact information</mat-card-subtitle>
+            </div>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="full_name" readonly>
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Email Address</mat-label>
+                <input matInput type="email" formControlName="email" readonly>
+                <mat-icon matSuffix>email</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Phone Number</mat-label>
+                <input matInput type="tel" formControlName="phone">
+                <mat-icon matSuffix>phone</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Location</mat-label>
+                <input matInput formControlName="location">
+                <mat-icon matSuffix>location_on</mat-icon>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Professional Information Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>work</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Professional Information</mat-card-title>
+              <mat-card-subtitle>Current role and experience details</mat-card-subtitle>
+            </div>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Current Job Title</mat-label>
+                <input matInput formControlName="current_job_title">
+                <mat-icon matSuffix>work</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Department</mat-label>
+                <input matInput formControlName="department">
+                <mat-icon matSuffix>business</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Team</mat-label>
+                <input matInput formControlName="team">
+                <mat-icon matSuffix>group</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Total Experience (Months)</mat-label>
+                <input matInput type="number" formControlName="months_experience" min="0">
+                <mat-icon matSuffix>schedule</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Date of Joining</mat-label>
+                <input matInput type="date" formControlName="date_of_joining">
+                <mat-icon matSuffix>event</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Reporting Officer</mat-label>
+                <input matInput formControlName="rep_officer_name" readonly>
+                <mat-icon matSuffix>supervisor_account</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <div class="bio-section">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Professional Bio</mat-label>
+                <textarea matInput formControlName="bio" rows="4" 
+                         placeholder="Tell us about your professional background, interests, and what drives you..."></textarea>
+                <mat-icon matSuffix>description</mat-icon>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Skills & Expertise Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>code</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Technical Skills</mat-card-title>
+              <mat-card-subtitle>Programming languages, frameworks, and tools</mat-card-subtitle>
+            </div>
+            <button mat-icon-button type="button" (click)="addSkill()" class="add-button">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div formArrayName="technical_skills" class="skills-container">
+              <div *ngFor="let skill of technicalSkills.controls; let i = index" class="skill-item">
+                <mat-form-field appearance="outline" class="skill-field">
+                  <mat-label>Skill {{ i + 1 }}</mat-label>
+                  <input matInput [formControlName]="i" placeholder="e.g., JavaScript, Python, React">
+                  <mat-icon matSuffix>code</mat-icon>
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="removeSkill(i)" class="remove-button" color="warn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button mat-stroked-button type="button" (click)="addSkill()" *ngIf="technicalSkills.length === 0" class="empty-state-button">
+                <mat-icon>add</mat-icon>
+                Add Your First Skill
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Achievements Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>emoji_events</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Achievements & Awards</mat-card-title>
+              <mat-card-subtitle>Professional accomplishments and recognitions</mat-card-subtitle>
+            </div>
+            <button mat-icon-button type="button" (click)="addAchievement()" class="add-button">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div formArrayName="achievements" class="achievements-container">
+              <div *ngFor="let achievement of achievements.controls; let i = index" class="achievement-item">
+                <mat-form-field appearance="outline" class="achievement-field">
+                  <mat-label>Achievement {{ i + 1 }}</mat-label>
+                  <textarea matInput [formControlName]="i" rows="2" 
+                           placeholder="Describe your achievement and its impact..."></textarea>
+                  <mat-icon matSuffix>emoji_events</mat-icon>
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="removeAchievement(i)" class="remove-button" color="warn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button mat-stroked-button type="button" (click)="addAchievement()" *ngIf="achievements.length === 0" class="empty-state-button">
+                <mat-icon>add</mat-icon>
+                Add Your First Achievement
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Education Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>school</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Education</mat-card-title>
+              <mat-card-subtitle>Academic qualifications and certifications</mat-card-subtitle>
+            </div>
+            <button mat-icon-button type="button" (click)="addEducation()" class="add-button">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div formArrayName="education" class="education-container">
+              <div *ngFor="let edu of education.controls; let i = index" [formGroupName]="i" class="education-item">
+                <div class="education-card">
+                  <div class="education-fields">
+                    <mat-form-field appearance="outline" class="education-field">
+                      <mat-label>Institution</mat-label>
+                      <input matInput formControlName="institution" placeholder="University or College name">
+                      <mat-icon matSuffix>school</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="education-field">
+                      <mat-label>Degree</mat-label>
+                      <input matInput formControlName="degree" placeholder="e.g., Bachelor of Science">
+                      <mat-icon matSuffix>workspace_premium</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="education-field">
+                      <mat-label>Field of Study</mat-label>
+                      <input matInput formControlName="field" placeholder="e.g., Computer Science">
+                      <mat-icon matSuffix>subject</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="education-field">
+                      <mat-label>Year</mat-label>
+                      <input matInput formControlName="year" placeholder="e.g., 2020">
+                      <mat-icon matSuffix>event</mat-icon>
+                    </mat-form-field>
+                  </div>
+                  <button mat-icon-button type="button" (click)="removeEducation(i)" class="remove-button" color="warn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <button mat-stroked-button type="button" (click)="addEducation()" *ngIf="education.length === 0" class="empty-state-button">
+                <mat-icon>add</mat-icon>
+                Add Your Education
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <!-- Work Experience -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>business</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Work Experience</mat-card-title>
+              <mat-card-subtitle>Professional experience and career history</mat-card-subtitle>
+            </div>
+            <button mat-icon-button type="button" (click)="addWorkExperience()" class="add-button">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <!-- New Work Experience Form -->
+            <div formArrayName="work_experiences" class="work-experiences-container">
+              <div *ngFor="let exp of workExperienceArray.controls; let i = index" [formGroupName]="i" class="work-experience-item">
+                <div class="work-experience-card">
+                  <div class="experience-fields">
+                    <div class="form-row">
+                      <mat-form-field appearance="outline" class="flex-2">
+                        <mat-label>Job Title</mat-label>
+                        <input matInput formControlName="job_title" placeholder="e.g., Senior Software Engineer">
+                        <mat-icon matSuffix>work</mat-icon>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="flex-1">
+                        <mat-label>Employment Type</mat-label>
+                        <mat-select formControlName="employment_type">
+                          <mat-option value="Full-time">Full-time</mat-option>
+                          <mat-option value="Part-time">Part-time</mat-option>
+                          <mat-option value="Contract">Contract</mat-option>
+                          <mat-option value="Internship">Internship</mat-option>
+                          <mat-option value="Freelance">Freelance</mat-option>
+                        </mat-select>
+                        <mat-icon matSuffix>schedule</mat-icon>
+                      </mat-form-field>
+                    </div>
+                    <div class="form-row">
+                      <mat-form-field appearance="outline" class="flex-1">
+                        <mat-label>Company Name</mat-label>
+                        <input matInput formControlName="company_name" placeholder="Company name">
+                        <mat-icon matSuffix>business</mat-icon>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="flex-1">
+                        <mat-label>Location</mat-label>
+                        <input matInput formControlName="location" placeholder="City, Country">
+                        <mat-icon matSuffix>location_on</mat-icon>
+                      </mat-form-field>
+                    </div>
+                    <div class="form-row">
+                      <div class="date-selector">
+                        <label class="date-label">Start Date</label>
+                        <div class="date-inputs">
+                          <mat-form-field appearance="outline" class="month-field">
+                            <mat-label>Month</mat-label>
+                            <mat-select formControlName="start_month">
+                              <mat-option *ngFor="let month of months; let i = index" [value]="i + 1">
+                                {{ month }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                          <mat-form-field appearance="outline" class="year-field">
+                            <mat-label>Year</mat-label>
+                            <mat-select formControlName="start_year">
+                              <mat-option *ngFor="let year of years" [value]="year">
+                                {{ year }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="date-selector">
+                        <label class="date-label">End Date</label>
+                        <div class="date-inputs">
+                          <mat-form-field appearance="outline" class="month-field">
+                            <mat-label>Month</mat-label>
+                            <mat-select formControlName="end_month">
+                              <mat-option *ngFor="let month of months; let i = index" [value]="i + 1">
+                                {{ month }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                          <mat-form-field appearance="outline" class="year-field">
+                            <mat-label>Year</mat-label>
+                            <mat-select formControlName="end_year">
+                              <mat-option *ngFor="let year of years" [value]="year">
+                                {{ year }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Job Description</mat-label>
+                      <textarea matInput formControlName="description" rows="3" 
+                               placeholder="Describe your role, responsibilities, and key achievements..."></textarea>
+                      <mat-icon matSuffix>description</mat-icon>
+                    </mat-form-field>
+                  </div>
+                  <button mat-icon-button type="button" (click)="removeWorkExperience(i)" class="remove-button" color="warn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <button mat-stroked-button type="button" (click)="addWorkExperience()" *ngIf="workExperienceArray.length === 0" class="empty-state-button">
+                <mat-icon>add</mat-icon>
+                Add Work Experience
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Certifications Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>verified</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Certifications</mat-card-title>
+              <mat-card-subtitle>Professional certifications and qualifications</mat-card-subtitle>
+            </div>
+            <button mat-icon-button type="button" (click)="addCertification()" class="add-button">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div formArrayName="certifications" class="certifications-container">
+              <div *ngFor="let cert of certifications.controls; let i = index" class="certification-item">
+                <mat-form-field appearance="outline" class="certification-field">
+                  <mat-label>Certification {{ i + 1 }}</mat-label>
+                  <input matInput [formControlName]="i" placeholder="e.g., AWS Certified Solutions Architect">
+                  <mat-icon matSuffix>verified</mat-icon>
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="removeCertification(i)" class="remove-button" color="warn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button mat-stroked-button type="button" (click)="addCertification()" *ngIf="certifications.length === 0" class="empty-state-button">
+                <mat-icon>add</mat-icon>
+                Add Your First Certification
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Publications Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>article</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Publications</mat-card-title>
+              <mat-card-subtitle>Research papers, articles, and publications</mat-card-subtitle>
+            </div>
+            <button mat-icon-button type="button" (click)="addPublication()" class="add-button">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div formArrayName="publications" class="publications-container">
+              <div *ngFor="let pub of publications.controls; let i = index" class="publication-item">
+                <mat-form-field appearance="outline" class="publication-field">
+                  <mat-label>Publication {{ i + 1 }}</mat-label>
+                  <textarea matInput [formControlName]="i" rows="2" 
+                           placeholder="Publication title, journal/conference, year..."></textarea>
+                  <mat-icon matSuffix>article</mat-icon>
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="removePublication(i)" class="remove-button" color="warn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button mat-stroked-button type="button" (click)="addPublication()" *ngIf="publications.length === 0" class="empty-state-button">
+                <mat-icon>add</mat-icon>
+                Add Your First Publication
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Preferred Roles Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>target</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Preferred Roles</mat-card-title>
+              <mat-card-subtitle>Roles you're interested in pursuing</mat-card-subtitle>
+            </div>
+            <button mat-icon-button type="button" (click)="addPreferredRole()" class="add-button">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <div formArrayName="preferred_roles" class="preferred-roles-container">
+              <div *ngFor="let role of preferredRoles.controls; let i = index" class="role-item">
+                <mat-form-field appearance="outline" class="role-field">
+                  <mat-label>Preferred Role {{ i + 1 }}</mat-label>
+                  <input matInput [formControlName]="i" placeholder="e.g., Senior Software Engineer">
+                  <mat-icon matSuffix>target</mat-icon>
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="removePreferredRole(i)" class="remove-button" color="warn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button mat-stroked-button type="button" (click)="addPreferredRole()" *ngIf="preferredRoles.length === 0" class="empty-state-button">
+                <mat-icon>add</mat-icon>
+                Add Preferred Role
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Career Aspirations Section -->
+      <div class="section-wrapper">
+        <mat-card class="modern-card">
+          <mat-card-header class="section-header">
+            <div class="section-icon">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="section-title-wrapper">
+              <mat-card-title>Career Aspirations</mat-card-title>
+              <mat-card-subtitle>Your career goals and future plans</mat-card-subtitle>
+            </div>
+          </mat-card-header>
+          <mat-card-content class="section-content">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>What are your career goals and aspirations?</mat-label>
+              <textarea matInput formControlName="career_aspirations" rows="4" 
+                       placeholder="Describe your long-term career goals, where you see yourself in the future, and what motivates you professionally..."></textarea>
+              <mat-icon matSuffix>trending_up</mat-icon>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
   </form>
 </div>

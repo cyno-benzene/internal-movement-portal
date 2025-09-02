@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: float = 0.5  # 30 seconds for testing
+    ACCESS_TOKEN_EXPIRE_MINUTES: float = 30  # Default 30 minutes, can be overridden by .env
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
     # CORS

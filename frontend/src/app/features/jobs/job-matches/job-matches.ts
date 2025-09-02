@@ -15,7 +15,7 @@ import { ApiService } from '../../../core/services/api';
 import { AuthService } from '../../../core/services/auth';
 import { Job } from '../../../core/models/job.model';
 import { EmployeeCandidate } from '../../../core/models/job.model';
-import { EmployeeProfileDialogComponent } from '../../../shared/components/employee-profile-dialog/employee-profile-dialog';
+import { EmployeeProfileDialogComponent } from '../../../shared/components/employee-profile-dialog/employee-profile-dialog-new';
 
 export interface JobMatch {
   employee_id: string;
@@ -224,9 +224,14 @@ export class JobMatchesComponent implements OnInit {
     const employee = this.matches.find(m => m.employee_id === employeeId);
     if (employee) {
       const dialogRef = this.dialog.open(EmployeeProfileDialogComponent, {
-        width: '800px',
-        maxWidth: '90vw',
-        maxHeight: '90vh',
+        width: '600px',
+        maxWidth: '600px',
+        height: '100vh',
+        maxHeight: '100vh',
+        position: { right: '0' },
+        panelClass: 'employee-profile-sidebar',
+        hasBackdrop: true,
+        backdropClass: 'sidebar-backdrop',
         data: {
           employeeId: employee.employee_id,
           employeeName: employee.employee_name,

@@ -115,7 +115,7 @@ export class ApiService {
     if (profile.name !== undefined) updateData.name = profile.name;
     if (profile.technical_skills !== undefined) updateData.technical_skills = profile.technical_skills;
     if (profile.achievements !== undefined) updateData.achievements = profile.achievements;
-    if (profile.years_experience !== undefined) updateData.years_experience = profile.years_experience;
+    if (profile.months_experience !== undefined) updateData.months_experience = profile.months_experience;
     if (profile.past_companies !== undefined) updateData.past_companies = profile.past_companies;
     if (profile.certifications !== undefined) updateData.certifications = profile.certifications;
     if (profile.education !== undefined) updateData.education = profile.education;
